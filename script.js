@@ -9,6 +9,7 @@ class AttendanceCard {
 
         this.createCard();
         this.addEventListeners();
+        this.defaultProgressBar();
     }
 
     createCard() {
@@ -37,8 +38,8 @@ class AttendanceCard {
                 <div class="top-progressbar-container" id="${this.code}-progressbar">
                 </div>
                 <div class="bottom-attendance-mark-button-container">
-                    <div class="present-button"><i class="material-symbols-outlined icon-size">check_circle</i></div>
-                    <div class="absent-button"><i class="material-symbols-outlined icon-size">cancel</i></div>
+                    <div class="${this.code}-present-button present-button"><i class="material-symbols-outlined icon-size">check_circle</i></div>
+                    <div class="${this.code}-absent-button absent-button"><i class="material-symbols-outlined icon-size">cancel</i></div>
                 </div>
             </div>
         `;
@@ -46,11 +47,18 @@ class AttendanceCard {
         // Append the card to the attendance card container
         document.querySelector('.attendance-card-container').appendChild(card);
     }
-
+    defaultProgressBar() {
+        const progressBarContainer = document.querySelector(`#${this.code}-progressbar`);
+        progressBarContainer.innerHTML = "";
+        console.log(progressBarContainer);
+        const percentageForProgressbar = ((this.attendanceCount / this.totalAttendanceCount)*100).toFixed(2);
+        const progressBar = new AttendanceProgressBarCard(0, `${this.code}-progressbar`);
+        progressBar.createCard();
+    }
     addEventListeners() {
         // Add event listeners for the present and absent buttons
-        const presentButton = document.querySelector('.present-button');
-        const absentButton = document.querySelector('.absent-button');
+        const presentButton = document.querySelector(`.${this.code}-present-button`);
+        const absentButton = document.querySelector(`.${this.code}-absent-button`);
 
         presentButton.addEventListener('click', () => this.markAttendancePresent());
         absentButton.addEventListener('click', () => this.markAttendanceAbsent());
@@ -111,10 +119,10 @@ const attendanceData = [
 // attendanceData.forEach(data => new AttendanceCard(data.subject, data.code));
 for (let elementAt = 0; elementAt < attendanceData.length; elementAt++){
     new AttendanceCard(attendanceData[elementAt].subject, attendanceData[elementAt].code);
-    const progressBarContainer = document.querySelector(`#${attendanceData[elementAt].code}-progressbar`);
-    progressBarContainer.innerHTML = "";
-    console.log(progressBarContainer);
-    // console.log(attendanceData[elementAt].code)
-    const progressBar = new AttendanceProgressBarCard(0, `${attendanceData[elementAt].code}-progressbar`);
-    progressBar.createCard();
+    // const progressBarContainer = document.querySelector(`#${attendanceData[elementAt].code}-progressbar`);
+    // progressBarContainer.innerHTML = "";
+    // console.log(progressBarContainer);
+    // // console.log(attendanceData[elementAt].code)
+    // const progressBar = new AttendanceProgressBarCard(0, `${attendanceData[elementAt].code}-progressbar`);
+    // progressBar.createCard();
 }
