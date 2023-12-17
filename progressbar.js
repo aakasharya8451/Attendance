@@ -4,6 +4,10 @@ class AttendanceProgressBarCard {
         this.parentElement = parentElement;
         this.determineColor();
     }
+    // constructor(percent) {
+    //     this.percent = percent;
+    //     this.determineColor();
+    // }
 
     determineColor() {
         if (this.percent > 85) {
@@ -61,6 +65,8 @@ class AttendanceProgressBarCard {
         }
       }
 
-const CA355Card = new AttendanceProgressBarCard(30, "CA355");
-CA355Card.createCard();
+// const CA355Card = new AttendanceProgressBarCard(30, "CA355");
+// CA355Card.createCard();
  
+// const CA355Card = new AttendanceProgressBarCard(30, "CA355-progressbar");
+// CA355Card.createCard();
