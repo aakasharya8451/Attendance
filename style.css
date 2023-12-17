@@ -14,13 +14,13 @@
     padding: 2rem;
 }
 .attendance-card-container{
-    border: .2rem aliceblue;
+    border: .2rem #ffffff;
     border-radius: 1.5rem;
     border-style: dashed;
     padding: 1.5rem;
 }
 .attendance-card{
-    background-color: aliceblue;
+    background-color: #ffffff;
     width: 100%;
     height: max-content;
     /* height: 30%; */
@@ -67,7 +67,7 @@
 .right-container{
     width: 30%;
     height: 100%;
-    background-color: aquamarine;
+    /* background-color: aquamarine; */
     display: flex;
     flex-direction: column;
 }
