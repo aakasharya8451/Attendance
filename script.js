@@ -1,10 +1,10 @@
 // JavaScript Class for Attendance Card
 class AttendanceCard {
-    constructor(subject, code) {
+    constructor(subject, code, totalAttendanceCount, attendanceCount) {
         this.subject = subject;
         this.code = code;
-        this.attendanceCount = 0;
-        this.totalAttendanceCount = 0;
+        this.attendanceCount = attendanceCount;
+        this.totalAttendanceCount = totalAttendanceCount;
         this.attendanceStatus = '';
 
         this.createCard();
@@ -51,8 +51,10 @@ class AttendanceCard {
         const progressBarContainer = document.querySelector(`#${this.code}-progressbar`);
         progressBarContainer.innerHTML = "";
         console.log(progressBarContainer);
-        const percentageForProgressbar = ((this.attendanceCount / this.totalAttendanceCount)*100).toFixed(2);
-        const progressBar = new AttendanceProgressBarCard(0, `${this.code}-progressbar`);
+        const percentageForProgressbar = ((this.attendanceCount / this.totalAttendanceCount) * 100).toFixed(2);
+        var varTempPrecentage = isNaN(percentageForProgressbar) ? 0 : percentageForProgressbar;
+        console.log(varTempPrecentage);
+        const progressBar = new AttendanceProgressBarCard(varTempPrecentage, `${this.code}-progressbar`);
         progressBar.createCard();
     }
     addEventListeners() {
@@ -107,22 +109,43 @@ class AttendanceCard {
 
 }
 
-// Sample data for attendance cards
-const attendanceData = [
-    { subject: 'Data Mining', code: 'CA355' },
-    { subject: 'Distributed Computing', code: 'CA356' },
-    { subject: 'Unix and Shell Programming', code: 'CA325' },
-    { subject: 'Distributed Database Systems', code: 'CA328' },
-];
 
 // Instantiate objects for each attendance card using the sample data
 // attendanceData.forEach(data => new AttendanceCard(data.subject, data.code));
-for (let elementAt = 0; elementAt < attendanceData.length; elementAt++){
-    new AttendanceCard(attendanceData[elementAt].subject, attendanceData[elementAt].code);
-    // const progressBarContainer = document.querySelector(`#${attendanceData[elementAt].code}-progressbar`);
-    // progressBarContainer.innerHTML = "";
-    // console.log(progressBarContainer);
-    // // console.log(attendanceData[elementAt].code)
-    // const progressBar = new AttendanceProgressBarCard(0, `${attendanceData[elementAt].code}-progressbar`);
-    // progressBar.createCard();
+
+const attendanceData = [
+  { subject: 'Data Mining', code: 'CA355' },
+  { subject: 'Distributed Computing', code: 'CA356' },
+  { subject: 'Unix and Shell Programming', code: 'CA325' },
+  { subject: 'Distributed Database Systems', code: 'CA328' },
+];
+const options = { method: 'GET' };
+
+async function fetchData(sheetnumber) {
+  const baseURL = "https://script.google.com/macros/s/AKfycbzWm-rHa-iVxcpDy9-csHtTXyUcBxrBilsbQ7ejYHCnp7VMDXUMBqcymcHBiYmMQN0/exec";
+  try {
+    const response = await fetch(`${baseURL}?sheetname=${sheetnumber}`, options);
+    const data = await response.json();
+    const totalStatuses = data.data.length;
+    const totalPresent = data.data.filter(item => item.status === 'Present').length;
+
+    console.log(`Subject: ${sheetnumber}`);
+    console.log('Total number of statuses:', totalStatuses);
+    console.log('Total number of Present statuses:', totalPresent);
+    return { totalStatuses, totalPresent };
+  } catch (err) {
+    console.error(err);
+  }
 }
+
+async function fetchDataForAllSubjects() {
+  for (let elementAt = 0; elementAt < attendanceData.length; elementAt++) {
+    const subject = attendanceData[elementAt].subject;
+    const code = attendanceData[elementAt].code;
+    
+    const { totalStatuses, totalPresent } = await fetchData(code);
+    new AttendanceCard(subject, code, totalStatuses, totalPresent);
+  }
+}
+
+fetchDataForAllSubjects();
