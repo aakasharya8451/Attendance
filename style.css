@@ -18,6 +18,12 @@
     border-radius: 1.5rem;
     border-style: dashed;
     padding: 1.5rem;
+    height: max-content;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2.5rem;
 }
 .attendance-card{
     background-color: #ffffff;

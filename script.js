@@ -63,13 +63,13 @@ class AttendanceCard {
         // console.log(countElement);
         countElement.textContent = `${this.attendanceCount}/${this.totalAttendanceCount}`;
         const progressBarContainer = document.querySelector(`#${this.code}-progressbar`);
+        progressBarContainer.innerHTML = "";
         // console.log(progressBarContainer);
         // console.log(`#${this.code}-progressbar`);
         // const CA355Card = new AttendanceProgressBarCard(30, "CA355-progressbar");
         // CA355Card.createCard();
         const percentageForProgressbar = ((this.attendanceCount / this.totalAttendanceCount)*100).toFixed(2);
         // console.log(percentageForProgressbar)
-        progressBarContainer.innerHTML = "";
         const progressBar = new AttendanceProgressBarCard(percentageForProgressbar, `${this.code}-progressbar`);
         progressBar.createCard();
 
@@ -79,8 +79,8 @@ class AttendanceCard {
         const countElement = document.querySelector(`#${this.code}-subheading-details-text`);
         countElement.textContent = `${this.attendanceCount}/${this.totalAttendanceCount}`;
         const progressBarContainer = document.querySelector(`#${this.code}-progressbar`);
-        const percentageForProgressbar = ((this.attendanceCount / this.totalAttendanceCount)*100).toFixed(2);
         progressBarContainer.innerHTML = "";
+        const percentageForProgressbar = ((this.attendanceCount / this.totalAttendanceCount)*100).toFixed(2);
         const progressBar = new AttendanceProgressBarCard(percentageForProgressbar, `${this.code}-progressbar`);
         progressBar.createCard();
     }
@@ -102,8 +102,19 @@ class AttendanceCard {
 // Sample data for attendance cards
 const attendanceData = [
     { subject: 'Data Mining', code: 'CA355' },
-    // Add more data for additional cards
+    { subject: 'Distributed Computing', code: 'CA356' },
+    { subject: 'Unix and Shell Programming', code: 'CA325' },
+    { subject: 'Distributed Database Systems', code: 'CA328' },
 ];
 
 // Instantiate objects for each attendance card using the sample data
-attendanceData.forEach(data => new AttendanceCard(data.subject, data.code));
+// attendanceData.forEach(data => new AttendanceCard(data.subject, data.code));
+for (let elementAt = 0; elementAt < attendanceData.length; elementAt++){
+    new AttendanceCard(attendanceData[elementAt].subject, attendanceData[elementAt].code);
+    const progressBarContainer = document.querySelector(`#${attendanceData[elementAt].code}-progressbar`);
+    progressBarContainer.innerHTML = "";
+    console.log(progressBarContainer);
+    // console.log(attendanceData[elementAt].code)
+    const progressBar = new AttendanceProgressBarCard(0, `${attendanceData[elementAt].code}-progressbar`);
+    progressBar.createCard();
+}
