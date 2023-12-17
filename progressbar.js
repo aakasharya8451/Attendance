@@ -1,7 +1,8 @@
 class AttendanceProgressBarCard {
-    constructor(title, percent) {
+    constructor(title, percent, parentElement) {
         this.title = title;
         this.percent = percent;
+        this.parentElement = parentElement;
         this.determineColor();
     }
 
@@ -65,11 +66,11 @@ class AttendanceProgressBarCard {
             circle2.style.setProperty("--stroke-color", this.strokeColor);
         }
 
-        var test = document.getElementById("CA355");
-        console.log(test)
-        test.appendChild(card);
+        var parentElementID = document.getElementById(this.parentElement);
+        parentElementID.appendChild(card);
         }
       }
 
-const CA355Card = new AttendanceProgressBarCard("CA355", 30);
+const CA355Card = new AttendanceProgressBarCard("CA355", 30, "CA355");
 CA355Card.createCard();
+ 
