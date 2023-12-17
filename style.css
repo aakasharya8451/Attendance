@@ -48,21 +48,22 @@
     flex-direction: column;
 }
 .subject-heading{
-    font-size: 4.8rem;
+    font-size: 7.2rem;
     font-weight: 600;
 }
 .subject-code{
-    font-size: 2.8rem;
+    font-size: 5.6rem;
 }
 .attendance-subject-details{
     width: 100%;
     height: max-content;
-    padding-top: .5rem;
+    padding-top: 1rem;
     padding-bottom: 1rem;
     /* background-color: rgb(0, 255, 72); */
+    gap: .75rem;
     display: flex;
     flex-direction: column;
-    font-size: 3.6rem;
+    font-size: 4.8rem;
 }
 .right-container{
     width: 30%;
@@ -70,6 +71,8 @@
     /* background-color: aquamarine; */
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 .top-progressbar-container{
     height: max-content;
@@ -83,8 +86,8 @@
 }
 .bottom-attendance-mark-button-container{
     height: max-content;
-    width: 100%;
-    background-color: rgb(134, 167, 0);
+    width: 75%;
+    /* background-color: rgb(134, 167, 0); */
     padding: .5rem;
     display: flex;
     flex-direction: row;
@@ -99,5 +102,13 @@
         'opsz' 60
 }
 .icon-size {
-    font-size: 4.2rem;
+    font-size: 6.4rem;
+}
+.present-button{
+    cursor: pointer;
+    color: #2ecc71;
+}
+.absent-button{
+    cursor: pointer;
+    color: #e74c3c;
 }
