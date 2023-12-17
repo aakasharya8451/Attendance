@@ -70,56 +70,81 @@ class AttendanceCard {
     }
 
     async markAttendancePresent() {
-    const bodyAttendanceData = { method: 'POST', body: `{"type":"Mark","sheetname":"${this.code}","status":"Present"}` };
+        // Display loading screen
+        const loadingScreen = document.createElement('div');
+        loadingScreen.classList.add('loading-screen');
+        loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
+        document.body.appendChild(loadingScreen);
 
-    try {
-        const response = await fetch(this.baseURL, bodyAttendanceData);
-        const responseData = await response.json();
+        const bodyAttendanceData = { method: 'POST', body: `{"type":"Mark","sheetname":"${this.code}","status":"Present"}` };
 
-        const { totalStatuses, totalPresent } = await fetchData(this.code);
-        this.attendanceCount = totalPresent;
-        this.totalAttendanceCount = totalStatuses;
+        try {
+            // Perform fetch request
+            const response = await fetch(this.baseURL, bodyAttendanceData);
+            const responseData = await response.json();
+            // console.log(responseData);
 
-        const countElement = document.querySelector(`#${this.code}-subheading-details-text`);
-        countElement.textContent = `${this.attendanceCount}/${this.totalAttendanceCount}`;
+            // Code to run after the fetch is complete
+            const { totalStatuses, totalPresent } = await fetchData(this.code);
+            this.attendanceCount = totalPresent;
+            this.totalAttendanceCount = totalStatuses;
 
-        const progressBarContainer = document.querySelector(`#${this.code}-progressbar`);
-        progressBarContainer.innerHTML = "";
+            const countElement = document.querySelector(`#${this.code}-subheading-details-text`);
+            countElement.textContent = `${this.attendanceCount}/${this.totalAttendanceCount}`;
 
-        const percentageForProgressbar = ((this.attendanceCount / this.totalAttendanceCount) * 100).toFixed(2);
+            const progressBarContainer = document.querySelector(`#${this.code}-progressbar`);
+            progressBarContainer.innerHTML = "";
 
-        const progressBar = new AttendanceProgressBarCard(percentageForProgressbar, `${this.code}-progressbar`);
-        progressBar.createCard();
-    } catch (err) {
-        console.error(err);
+            const percentageForProgressbar = ((this.attendanceCount / this.totalAttendanceCount) * 100).toFixed(2);
+
+            const progressBar = new AttendanceProgressBarCard(percentageForProgressbar, `${this.code}-progressbar`);
+            progressBar.createCard();
+        } catch (err) {
+            console.error(err);
+        } finally {
+            // Hide loading screen
+            document.body.removeChild(loadingScreen);
+        }
     }
-    }
+
+
 
 
     async markAttendanceAbsent() {
-    const bodyAttendanceData = { method: 'POST', body: `{"type":"Mark","sheetname":"${this.code}","status":"Absent"}` };
-    
-    try {
-        const response = await fetch(this.baseURL, bodyAttendanceData);
-        const responseData = await response.json();
+        // Display loading screen
+        const loadingScreen = document.createElement('div');
+        loadingScreen.classList.add('loading-screen');
+        loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
+        document.body.appendChild(loadingScreen);
 
-        // Code to run after the fetch is complete
-        const { totalStatuses, totalPresent } = await fetchData(this.code);
-        this.totalAttendanceCount = totalStatuses;
+        const bodyAttendanceData = { method: 'POST', body: `{"type":"Mark","sheetname":"${this.code}","status":"Absent"}` };
 
-        const countElement = document.querySelector(`#${this.code}-subheading-details-text`);
-        countElement.textContent = `${this.attendanceCount}/${this.totalAttendanceCount}`;
+        try {
+            // Perform fetch request
+            const response = await fetch(this.baseURL, bodyAttendanceData);
+            const responseData = await response.json();
+            // console.log(responseData);
+            // Code to run after the fetch is complete
+            const { totalStatuses, totalPresent } = await fetchData(this.code);
+            this.totalAttendanceCount = totalStatuses;
 
-        const progressBarContainer = document.querySelector(`#${this.code}-progressbar`);
-        progressBarContainer.innerHTML = "";
+            const countElement = document.querySelector(`#${this.code}-subheading-details-text`);
+            countElement.textContent = `${this.attendanceCount}/${this.totalAttendanceCount}`;
 
-        const percentageForProgressbar = ((this.attendanceCount / this.totalAttendanceCount) * 100).toFixed(2);
-        const progressBar = new AttendanceProgressBarCard(percentageForProgressbar, `${this.code}-progressbar`);
-        progressBar.createCard();
-    } catch (err) {
-        console.error(err);
+            const progressBarContainer = document.querySelector(`#${this.code}-progressbar`);
+            progressBarContainer.innerHTML = "";
+
+            const percentageForProgressbar = ((this.attendanceCount / this.totalAttendanceCount) * 100).toFixed(2);
+            const progressBar = new AttendanceProgressBarCard(percentageForProgressbar, `${this.code}-progressbar`);
+            progressBar.createCard();
+        } catch (err) {
+            console.error(err);
+        } finally {
+            // Hide loading screen
+            document.body.removeChild(loadingScreen);
+        }
     }
-    }
+
 
     // markAttendance(status) {
     //     // Update attendance count and status
