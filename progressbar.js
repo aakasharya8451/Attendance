@@ -1,6 +1,5 @@
 class AttendanceProgressBarCard {
-    constructor(title, percent, parentElement) {
-        this.title = title;
+    constructor(percent, parentElement) {
         this.percent = percent;
         this.parentElement = parentElement;
         this.determineColor();
@@ -50,16 +49,7 @@ class AttendanceProgressBarCard {
         percentDiv.appendChild(svg);
         percentDiv.appendChild(numberDiv);
 
-        const titleDiv = document.createElement("div");
-        titleDiv.className = "title";
-
-        const h2 = document.createElement("h2");
-        h2.innerHTML = this.title;
-
-        titleDiv.appendChild(h2);
-
         card.appendChild(percentDiv);
-        card.appendChild(titleDiv);
 
           // Set stroke color
         if (this.strokeColor) {
@@ -71,6 +61,6 @@ class AttendanceProgressBarCard {
         }
       }
 
-const CA355Card = new AttendanceProgressBarCard("CA355", 30, "CA355");
+const CA355Card = new AttendanceProgressBarCard(30, "CA355");
 CA355Card.createCard();
  
