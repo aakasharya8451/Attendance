@@ -1,10 +1,11 @@
 // JavaScript Class for Attendance Card
 class AttendanceCard {
-    constructor(subject, code, totalAttendanceCount, attendanceCount) {
+    constructor(subject, code, totalAttendanceCount, attendanceCount, baseURL) {
         this.subject = subject;
         this.code = code;
         this.attendanceCount = attendanceCount;
         this.totalAttendanceCount = totalAttendanceCount;
+        this.baseURL = baseURL;
         this.attendanceStatus = '';
 
         this.createCard();
@@ -47,6 +48,7 @@ class AttendanceCard {
         // Append the card to the attendance card container
         document.querySelector('.attendance-card-container').appendChild(card);
     }
+
     defaultProgressBar() {
         const progressBarContainer = document.querySelector(`#${this.code}-progressbar`);
         progressBarContainer.innerHTML = "";
@@ -57,6 +59,7 @@ class AttendanceCard {
         const progressBar = new AttendanceProgressBarCard(varTempPrecentage, `${this.code}-progressbar`);
         progressBar.createCard();
     }
+
     addEventListeners() {
         // Add event listeners for the present and absent buttons
         const presentButton = document.querySelector(`.${this.code}-present-button`);
@@ -73,6 +76,11 @@ class AttendanceCard {
         // console.log(countElement);
         countElement.textContent = `${this.attendanceCount}/${this.totalAttendanceCount}`;
         const progressBarContainer = document.querySelector(`#${this.code}-progressbar`);
+        const bodyAttendanceData = {method: 'POST', body: `{"type":"Mark","sheetname":"${this.code}","status":"Present"}`};
+        fetch(this.baseURL, bodyAttendanceData)
+            .then(response => response.json())
+            .then(response => console.log(response))
+            .catch(err => console.error(err));
         progressBarContainer.innerHTML = "";
         // console.log(progressBarContainer);
         // console.log(`#${this.code}-progressbar`);
@@ -82,13 +90,18 @@ class AttendanceCard {
         // console.log(percentageForProgressbar)
         const progressBar = new AttendanceProgressBarCard(percentageForProgressbar, `${this.code}-progressbar`);
         progressBar.createCard();
-
     }
+
     markAttendanceAbsent() {
         this.totalAttendanceCount++
         const countElement = document.querySelector(`#${this.code}-subheading-details-text`);
         countElement.textContent = `${this.attendanceCount}/${this.totalAttendanceCount}`;
         const progressBarContainer = document.querySelector(`#${this.code}-progressbar`);
+        const bodyAttendanceData = {method: 'POST', body: `{"type":"Mark","sheetname":"${this.code}","status":"Absent"}`};
+        fetch(this.baseURL, bodyAttendanceData)
+            .then(response => response.json())
+            .then(response => console.log(response))
+            .catch(err => console.error(err));
         progressBarContainer.innerHTML = "";
         const percentageForProgressbar = ((this.attendanceCount / this.totalAttendanceCount)*100).toFixed(2);
         const progressBar = new AttendanceProgressBarCard(percentageForProgressbar, `${this.code}-progressbar`);
@@ -121,8 +134,8 @@ const attendanceData = [
 ];
 const options = { method: 'GET' };
 
+const baseURL = "https://script.google.com/macros/s/AKfycbzWm-rHa-iVxcpDy9-csHtTXyUcBxrBilsbQ7ejYHCnp7VMDXUMBqcymcHBiYmMQN0/exec";
 async function fetchData(sheetnumber) {
-  const baseURL = "https://script.google.com/macros/s/AKfycbzWm-rHa-iVxcpDy9-csHtTXyUcBxrBilsbQ7ejYHCnp7VMDXUMBqcymcHBiYmMQN0/exec";
   try {
     const response = await fetch(`${baseURL}?sheetname=${sheetnumber}`, options);
     const data = await response.json();
@@ -144,7 +157,7 @@ async function fetchDataForAllSubjects() {
     const code = attendanceData[elementAt].code;
     
     const { totalStatuses, totalPresent } = await fetchData(code);
-    new AttendanceCard(subject, code, totalStatuses, totalPresent);
+    new AttendanceCard(subject, code, totalStatuses, totalPresent, baseURL);
   }
 }
 
