@@ -69,44 +69,58 @@ class AttendanceCard {
         absentButton.addEventListener('click', () => this.markAttendanceAbsent());
     }
 
-    markAttendancePresent() {
-        this.attendanceCount++;
-        this.totalAttendanceCount++;
+    async markAttendancePresent() {
+    const bodyAttendanceData = { method: 'POST', body: `{"type":"Mark","sheetname":"${this.code}","status":"Present"}` };
+
+    try {
+        const response = await fetch(this.baseURL, bodyAttendanceData);
+        const responseData = await response.json();
+
+        const { totalStatuses, totalPresent } = await fetchData(this.code);
+        this.attendanceCount = totalPresent;
+        this.totalAttendanceCount = totalStatuses;
+
         const countElement = document.querySelector(`#${this.code}-subheading-details-text`);
-        // console.log(countElement);
         countElement.textContent = `${this.attendanceCount}/${this.totalAttendanceCount}`;
+
         const progressBarContainer = document.querySelector(`#${this.code}-progressbar`);
-        const bodyAttendanceData = {method: 'POST', body: `{"type":"Mark","sheetname":"${this.code}","status":"Present"}`};
-        fetch(this.baseURL, bodyAttendanceData)
-            .then(response => response.json())
-            .then(response => console.log(response))
-            .catch(err => console.error(err));
         progressBarContainer.innerHTML = "";
-        // console.log(progressBarContainer);
-        // console.log(`#${this.code}-progressbar`);
-        // const CA355Card = new AttendanceProgressBarCard(30, "CA355-progressbar");
-        // CA355Card.createCard();
-        const percentageForProgressbar = ((this.attendanceCount / this.totalAttendanceCount)*100).toFixed(2);
-        // console.log(percentageForProgressbar)
+
+        const percentageForProgressbar = ((this.attendanceCount / this.totalAttendanceCount) * 100).toFixed(2);
+
         const progressBar = new AttendanceProgressBarCard(percentageForProgressbar, `${this.code}-progressbar`);
         progressBar.createCard();
+    } catch (err) {
+        console.error(err);
+    }
     }
 
-    markAttendanceAbsent() {
-        this.totalAttendanceCount++
+
+    async markAttendanceAbsent() {
+    const bodyAttendanceData = { method: 'POST', body: `{"type":"Mark","sheetname":"${this.code}","status":"Absent"}` };
+    
+    try {
+        const response = await fetch(this.baseURL, bodyAttendanceData);
+        const responseData = await response.json();
+
+        // Code to run after the fetch is complete
+        const { totalStatuses, totalPresent } = await fetchData(this.code);
+        this.totalAttendanceCount = totalStatuses;
+
         const countElement = document.querySelector(`#${this.code}-subheading-details-text`);
         countElement.textContent = `${this.attendanceCount}/${this.totalAttendanceCount}`;
+
         const progressBarContainer = document.querySelector(`#${this.code}-progressbar`);
-        const bodyAttendanceData = {method: 'POST', body: `{"type":"Mark","sheetname":"${this.code}","status":"Absent"}`};
-        fetch(this.baseURL, bodyAttendanceData)
-            .then(response => response.json())
-            .then(response => console.log(response))
-            .catch(err => console.error(err));
         progressBarContainer.innerHTML = "";
-        const percentageForProgressbar = ((this.attendanceCount / this.totalAttendanceCount)*100).toFixed(2);
+
+        const percentageForProgressbar = ((this.attendanceCount / this.totalAttendanceCount) * 100).toFixed(2);
         const progressBar = new AttendanceProgressBarCard(percentageForProgressbar, `${this.code}-progressbar`);
         progressBar.createCard();
+    } catch (err) {
+        console.error(err);
     }
+    }
+
     // markAttendance(status) {
     //     // Update attendance count and status
     //     this.attendanceCount++;
@@ -141,11 +155,9 @@ async function fetchData(sheetnumber) {
     const data = await response.json();
     const totalStatuses = data.data.length;
     const totalPresent = data.data.filter(item => item.status === 'Present').length;
-
-    console.log(`Subject: ${sheetnumber}`);
-    console.log('Total number of statuses:', totalStatuses);
-    console.log('Total number of Present statuses:', totalPresent);
+      
     return { totalStatuses, totalPresent };
+      
   } catch (err) {
     console.error(err);
   }
