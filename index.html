@@ -3,13 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet" href="root.css">
     <link rel="stylesheet" href="style.css">
     <title>Attendance</title>
 </head>
 <body>
     <section class="main">
+        <div class="heading">Attendance</div>
+        <section class="attendance-card-container">
+            <div class="attendance-card">
+                <div class="left-container">
+                    <div class="attendance-subject-heading-conatiner">
+                        <span class="subject-heading">Data Mining</span>
+                        <span class="subject-code">CA355</span>
+                    </div>
+                    <div class="attendance-subject-details">
+                        <div class="attendance-count">
+                            <span class="subheading-text">Attendance: </span>
+                            <span class="subheading-details-text"></span>
+                        </div>
+                        <div class="attendance-status">
+                            <span class="subheading-text">Status: </span>
+                            <span class="subheading-details-text"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="right-container">
+                    <div class="top-progressbar-container">
+                        <div class="pie" data-pie='{ "round": false, "percent": 80, "colorSlice": "#009908", "colorCircle": "#990000", "time": 20 }'></div>
+                    </div>
+                    <div class="bottom-attendance-mark-button-container">
+                        <div class="present-button"><i class="material-symbols-outlined icon-size">check_circle</i></div>
+                        <div class="absent-button"><i class="material-symbols-outlined icon-size">cancel</i></div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </section>
+    
+    <script src="https://cdn.jsdelivr.net/gh/tomickigrzegorz/circular-progress-bar@1.2.0/dist/circularProgressBar.min.js"></script>
     <script src="script.js"></script>
+    
 </body>
 </html>
