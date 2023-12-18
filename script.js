@@ -53,10 +53,12 @@ class AttendanceCard {
     defaultProgressBar() {
         const progressBarContainer = document.querySelector(`#${this.code}-progressbar`);
         progressBarContainer.innerHTML = "";
-        console.log(progressBarContainer);
+        // console.log(progressBarContainer);
+
         const percentageForProgressbar = ((this.attendanceCount / this.totalAttendanceCount) * 100).toFixed(2);
-        var varTempPrecentage = isNaN(percentageForProgressbar) ? 0 : percentageForProgressbar;
-        console.log(varTempPrecentage);
+        const varTempPrecentage = isNaN(percentageForProgressbar) ? 0 : percentageForProgressbar;
+        // console.log(varTempPrecentage);
+
         const progressBar = new AttendanceProgressBarCard(varTempPrecentage, `${this.code}-progressbar`);
         progressBar.createCard();
     }
@@ -140,8 +142,9 @@ class AttendanceCard {
                     progressBarContainer.innerHTML = "";
 
                     const percentageForProgressbar = ((attendanceCountN / totalAttendanceCountN) * 100).toFixed(2);
+                    const varTempPrecentage = isNaN(percentageForProgressbar) ? 0 : percentageForProgressbar;
 
-                    const progressBar = new AttendanceProgressBarCard(percentageForProgressbar, `${code}-progressbar`);
+                    const progressBar = new AttendanceProgressBarCard(varTempPrecentage, `${code}-progressbar`);
                     progressBar.createCard();
                 } catch (err) {
                     console.error(err);
@@ -191,8 +194,9 @@ class AttendanceCard {
             progressBarContainer.innerHTML = "";
 
             const percentageForProgressbar = ((this.attendanceCount / this.totalAttendanceCount) * 100).toFixed(2);
+            const varTempPrecentage = isNaN(percentageForProgressbar) ? 0 : percentageForProgressbar;
 
-            const progressBar = new AttendanceProgressBarCard(percentageForProgressbar, `${this.code}-progressbar`);
+            const progressBar = new AttendanceProgressBarCard(varTempPrecentage, `${this.code}-progressbar`);
             progressBar.createCard();
         } catch (err) {
             console.error(err);
@@ -227,7 +231,9 @@ class AttendanceCard {
             progressBarContainer.innerHTML = "";
 
             const percentageForProgressbar = ((this.attendanceCount / this.totalAttendanceCount) * 100).toFixed(2);
-            const progressBar = new AttendanceProgressBarCard(percentageForProgressbar, `${this.code}-progressbar`);
+            const varTempPrecentage = isNaN(percentageForProgressbar) ? 0 : percentageForProgressbar;
+
+            const progressBar = new AttendanceProgressBarCard(varTempPrecentage, `${this.code}-progressbar`);
             progressBar.createCard();
         } catch (err) {
             console.error(err);
