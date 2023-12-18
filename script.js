@@ -41,6 +41,7 @@ class AttendanceCard {
                 <div class="bottom-attendance-mark-button-container">
                     <div class="${this.code}-present-button present-button"><i class="material-symbols-outlined icon-size">check_circle</i></div>
                     <div class="${this.code}-absent-button absent-button"><i class="material-symbols-outlined icon-size">cancel</i></div>
+                    <div class="${this.code}-undo-button undo-button"><i class="material-symbols-outlined icon-size">undo</i></div>
                 </div>
             </div>
         `;
@@ -64,11 +65,46 @@ class AttendanceCard {
         // Add event listeners for the present and absent buttons
         const presentButton = document.querySelector(`.${this.code}-present-button`);
         const absentButton = document.querySelector(`.${this.code}-absent-button`);
+        const undoButton = document.querySelector(`.${this.code}-undo-button`);
 
         presentButton.addEventListener('click', () => this.markAttendancePresent());
         absentButton.addEventListener('click', () => this.markAttendanceAbsent());
+        undoButton.addEventListener('click', () => this.undoLastAttendance());
     }
 
+    async undoLastAttendance() {
+        // console.log(this.code, "undo Button pressed");
+        try {
+            const { lastDate, lastStatus } = await fetchLastAttendanceData(this.code);
+            const undoMessageScreen = document.createElement('div');
+            undoMessageScreen.classList.add('undo-message-screen');
+            undoMessageScreen.innerHTML = `
+                <div class="message-box">
+                    <p>Are you sure you want to undo the last attendance?</p>
+                    <p>Date: ${lastDate}</p>
+                    <p>Status: ${lastStatus}</p>
+                    <button class="${this.code}-confirmUndo">Confirm</button>
+                    <button class="cancel ${this.code}-cancelUndo">Cancel</button>
+                </div>
+            `;
+            document.body.appendChild(undoMessageScreen);
+            function confirmUndo() { 
+                console.log("Undo confirmed");
+                document.body.removeChild(undoMessageScreen);
+            }
+            function cancelUndo() { 
+                // console.log("Undo canceled");
+                document.body.removeChild(undoMessageScreen);
+            }
+            const undoConfirmButton = document.querySelector(`.${this.code}-confirmUndo`);
+            const undoCancelButton = document.querySelector(`.${this.code}-cancelUndo`);
+            undoConfirmButton.addEventListener('click', () => confirmUndo());
+            undoCancelButton.addEventListener('click', () => cancelUndo());
+        } catch (err) {
+            console.error(err);
+        }
+    }
+    
     async markAttendancePresent() {
         // Display loading screen
         const loadingScreen = document.createElement('div');
@@ -175,27 +211,51 @@ const options = { method: 'GET' };
 
 const baseURL = "https://script.google.com/macros/s/AKfycbzWm-rHa-iVxcpDy9-csHtTXyUcBxrBilsbQ7ejYHCnp7VMDXUMBqcymcHBiYmMQN0/exec";
 async function fetchData(sheetnumber) {
-  try {
-    const response = await fetch(`${baseURL}?sheetname=${sheetnumber}`, options);
-    const data = await response.json();
-    const totalStatuses = data.data.length;
-    const totalPresent = data.data.filter(item => item.status === 'Present').length;
+    try {
+        const response = await fetch(`${baseURL}?sheetname=${sheetnumber}`, options);
+        const data = await response.json();
+        const totalStatuses = data.data.length;
+        const totalPresent = data.data.filter(item => item.status === 'Present').length;
       
-    return { totalStatuses, totalPresent };
+        return { totalStatuses, totalPresent };
       
-  } catch (err) {
-    console.error(err);
-  }
+    } catch (err) {
+        console.error(err);
+    }
+}
+async function fetchLastAttendanceData(sheetnumber) {
+    try {
+        const response = await fetch(`${baseURL}?sheetname=${sheetnumber}`, options);
+        const data = await response.json();
+        const totalNumberOfStatuses = data.data.length;
+        const lastDate = data.data[totalNumberOfStatuses-1].date;
+        const lastStatus = data.data[totalNumberOfStatuses-1].status;
+      
+        return { lastDate, lastStatus };
+      
+    } catch (err) {
+        console.error(err);
+    }
 }
 
 async function fetchDataForAllSubjects() {
-  for (let elementAt = 0; elementAt < attendanceData.length; elementAt++) {
-    const subject = attendanceData[elementAt].subject;
-    const code = attendanceData[elementAt].code;
-    
-    const { totalStatuses, totalPresent } = await fetchData(code);
-    new AttendanceCard(subject, code, totalStatuses, totalPresent, baseURL);
-  }
+    const loadingScreen = document.createElement('div');
+    loadingScreen.classList.add('loading-screen');
+    loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
+    // document.body.appendChild(loadingScreen);
+    try {
+        for (let elementAt = 0; elementAt < attendanceData.length; elementAt++) {
+          const subject = attendanceData[elementAt].subject;
+          const code = attendanceData[elementAt].code;
+          
+          const { totalStatuses, totalPresent } = await fetchData(code);
+          new AttendanceCard(subject, code, totalStatuses, totalPresent, baseURL);
+        }
+    } catch (err) {
+        console.error(err);
+    } finally {
+        // document.body.removeChild(loadingScreen);
+    }
 }
 
 fetchDataForAllSubjects();
