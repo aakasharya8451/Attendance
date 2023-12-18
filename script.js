@@ -6,7 +6,7 @@ class AttendanceCard {
         this.attendanceCount = attendanceCount;
         this.totalAttendanceCount = totalAttendanceCount;
         this.baseURL = baseURL;
-        this.attendanceStatus = '';
+        this.attendanceStatus = 'Attend Next 4 Class';
 
         this.createCard();
         this.addEventListeners();
@@ -84,7 +84,7 @@ class AttendanceCard {
 
             if (!attendanceData) {
                 // Handle the case when there is no data
-                console.log('No attendance data available.');
+                // console.log('No attendance data available.');
                 undoMessageScreen.innerHTML = "";
                 undoMessageScreen.innerHTML = `
                     <div class="message-box">
@@ -115,7 +115,7 @@ class AttendanceCard {
                     </div>
                 `;
                 document.body.appendChild(undoMessageScreen);
-                console.log(this.code);
+                // console.log(this.code);
     
                 async function confirmUndo(sheetName, baseURL) {
                     const loadingScreen = document.createElement('div');
@@ -130,7 +130,7 @@ class AttendanceCard {
                         // console.log(responseData);
                         // console.log(sheetName);
                         // console.log(bodyUndoData);
-                        console.log("Undo confirmed");
+                        // console.log("Undo confirmed");
                         undoMessageScreen.innerHTML = "";
                         undoMessageScreen.innerHTML = `
                             <div class="message-box">
@@ -298,7 +298,7 @@ const attendanceData = [
 ];
 const options = { method: 'GET' };
 
-const baseURL = "https://script.google.com/macros/s/AKfycbzWm-rHa-iVxcpDy9-csHtTXyUcBxrBilsbQ7ejYHCnp7VMDXUMBqcymcHBiYmMQN0/exec";
+const baseURL = "https://script.google.com/macros/s/AKfycbyEKlvkTyjaugWkXKvij_DmUNlNZPrAtCXiZJmSDhUoF5RGJ40XvLnr7siULZ-FgUQ/exec";
 async function fetchData(sheetnumber) {
     try {
         const response = await fetch(`${baseURL}?sheetname=${sheetnumber}`, options);
@@ -360,4 +360,74 @@ async function fetchDataForAllSubjects() {
     }
 }
 
-fetchDataForAllSubjects();
+async function login() {
+    const loginScreen = document.createElement('div');
+    loginScreen.classList.add('login-message-screen');
+    loginScreen.innerHTML = `
+        <div class="message-box login-message-box">
+            <p>Login</p>
+            <label for="password">Enter Password:</label>
+            <input type="password" id="password" name="password">
+            <br>
+            <button class="confirmLogin">Login</button>
+            <!-- <button class="cancel cancelLogin">Cancel</button> -->
+        </div>
+    `;
+    document.body.appendChild(loginScreen);
+
+    const passwordInput = loginScreen.querySelector('#password');
+    const loginMessageBox = document.querySelector(".login-message-box");
+    const errorMessage = document.createElement('h2');
+    errorMessage.classList.add('error-message');
+
+    const confirmLoginButton = loginScreen.querySelector('.confirmLogin');
+    // const cancelLoginButton = loginScreen.querySelector('.cancelLogin');
+    confirmLoginButton.addEventListener('click', () => confirmLogin());
+    // cancelLoginButton.addEventListener('click', () => cancelLogin());
+
+    async function confirmLogin() {
+        const loadingScreen = document.createElement('div');
+        loadingScreen.classList.add('loading-screen');
+        loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
+        document.body.appendChild(loadingScreen);
+        loginMessageBox.appendChild(errorMessage);
+        
+        const inputPassword = passwordInput.value;
+        try {
+            // console.log(inputPassword);
+            const authenticationBody = {
+                method: 'POST',
+                headers: {},
+                body: JSON.stringify({
+                    type: 'Authentication',
+                    password: inputPassword
+                })
+            }
+            const response = await fetch(baseURL, authenticationBody);
+
+            if (response.ok) {
+                const result = await response.json();
+                if (result.status) {
+                    // console.log(result.message);
+                    cancelLogin();
+                    fetchDataForAllSubjects();
+                } else {
+                    // console.log(result.error);
+                    errorMessage.innerText = result.error;
+                }
+            }
+        } catch (err) {
+        console.error(err);
+        } finally {
+            document.body.removeChild(loadingScreen);
+        }
+    }
+
+    async function cancelLogin() {
+        document.body.removeChild(loginScreen);
+    }
+    
+}
+
+login()
+
