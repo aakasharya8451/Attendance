@@ -88,23 +88,82 @@ class AttendanceCard {
                 </div>
             `;
             document.body.appendChild(undoMessageScreen);
-            function confirmUndo() { 
-                console.log("Undo confirmed");
-                document.body.removeChild(undoMessageScreen);
+            console.log(this.code);
+
+            async function confirmUndo(sheetName, baseURL) {
+                const loadingScreen = document.createElement('div');
+                loadingScreen.classList.add('loading-screen');
+                loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
+                document.body.appendChild(loadingScreen);
+                try {
+                    const bodyUndoData = { method: 'POST', body: `{"type":"Undo","sheetname":"${sheetName}"}` };
+                    const response = await fetch(baseURL, bodyUndoData);
+                    const responseData = await response.json();
+    
+                    // console.log(responseData);
+                    // console.log(sheetName);
+                    // console.log(bodyUndoData);
+                    console.log("Undo confirmed");
+                    undoMessageScreen.innerHTML = "";
+                    undoMessageScreen.innerHTML = `
+                        <div class="message-box">
+                            <p>${responseData.message}</p>
+                            <button class="cancel ${sheetName}-cancelSubCancelUndo">Cancel</button>
+                        </div>
+                    `;
+                    const cancelSubCancelUndoButton = document.querySelector(`.${sheetName}-cancelSubCancelUndo`);
+                    cancelSubCancelUndoButton.addEventListener('click', () => cancelSubCancelUndo(sheetName));
+                } catch (err) {
+                    console.error(err);
+                } finally {
+                    // Hide loading screen
+                    document.body.removeChild(loadingScreen);
+                }
             }
-            function cancelUndo() { 
+
+            async function cancelSubCancelUndo(code) {
+                // console.log("Undo canceled");
+                document.body.removeChild(undoMessageScreen);
+                const loadingScreen = document.createElement('div');
+                loadingScreen.classList.add('loading-screen');
+                loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
+                document.body.appendChild(loadingScreen);
+                try {
+                    const { totalStatuses, totalPresent } = await fetchData(code);
+                    const attendanceCountN = totalPresent;
+                    const totalAttendanceCountN = totalStatuses;
+
+                    const countElement = document.querySelector(`#${code}-subheading-details-text`);
+                    countElement.textContent = `${attendanceCountN}/${totalAttendanceCountN}`;
+
+                    const progressBarContainer = document.querySelector(`#${code}-progressbar`);
+                    progressBarContainer.innerHTML = "";
+
+                    const percentageForProgressbar = ((attendanceCountN / totalAttendanceCountN) * 100).toFixed(2);
+
+                    const progressBar = new AttendanceProgressBarCard(percentageForProgressbar, `${code}-progressbar`);
+                    progressBar.createCard();
+                } catch (err) {
+                    console.error(err);
+                } finally {
+                    // Hide loading screen
+                    document.body.removeChild(loadingScreen);
+                }
+            }
+
+            function cancelUndo() {
                 // console.log("Undo canceled");
                 document.body.removeChild(undoMessageScreen);
             }
             const undoConfirmButton = document.querySelector(`.${this.code}-confirmUndo`);
             const undoCancelButton = document.querySelector(`.${this.code}-cancelUndo`);
-            undoConfirmButton.addEventListener('click', () => confirmUndo());
+            undoConfirmButton.addEventListener('click', () => confirmUndo(this.code, this.baseURL));
             undoCancelButton.addEventListener('click', () => cancelUndo());
         } catch (err) {
             console.error(err);
         }
     }
-    
+
     async markAttendancePresent() {
         // Display loading screen
         const loadingScreen = document.createElement('div');
@@ -143,9 +202,6 @@ class AttendanceCard {
         }
     }
 
-
-
-
     async markAttendanceAbsent() {
         // Display loading screen
         const loadingScreen = document.createElement('div');
@@ -180,7 +236,7 @@ class AttendanceCard {
             document.body.removeChild(loadingScreen);
         }
     }
-
+}
 
     // markAttendance(status) {
     //     // Update attendance count and status
@@ -195,7 +251,7 @@ class AttendanceCard {
     //     statusElement.textContent = this.attendanceStatus;
     // }
 
-}
+// }
 
 
 // Instantiate objects for each attendance card using the sample data
@@ -224,6 +280,10 @@ async function fetchData(sheetnumber) {
     }
 }
 async function fetchLastAttendanceData(sheetnumber) {
+    const loadingScreen = document.createElement('div');
+    loadingScreen.classList.add('loading-screen');
+    loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
+    document.body.appendChild(loadingScreen);
     try {
         const response = await fetch(`${baseURL}?sheetname=${sheetnumber}`, options);
         const data = await response.json();
@@ -235,6 +295,8 @@ async function fetchLastAttendanceData(sheetnumber) {
       
     } catch (err) {
         console.error(err);
+    } finally {
+        document.body.removeChild(loadingScreen);
     }
 }
 
@@ -242,7 +304,7 @@ async function fetchDataForAllSubjects() {
     const loadingScreen = document.createElement('div');
     loadingScreen.classList.add('loading-screen');
     loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
-    // document.body.appendChild(loadingScreen);
+    document.body.appendChild(loadingScreen);
     try {
         for (let elementAt = 0; elementAt < attendanceData.length; elementAt++) {
           const subject = attendanceData[elementAt].subject;
@@ -254,7 +316,7 @@ async function fetchDataForAllSubjects() {
     } catch (err) {
         console.error(err);
     } finally {
-        // document.body.removeChild(loadingScreen);
+        document.body.removeChild(loadingScreen);
     }
 }
 
