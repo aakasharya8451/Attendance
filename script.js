@@ -77,91 +77,118 @@ class AttendanceCard {
     async undoLastAttendance() {
         // console.log(this.code, "undo Button pressed");
         try {
-            const { lastDate, lastStatus } = await fetchLastAttendanceData(this.code);
+            const attendanceData = await fetchLastAttendanceData(this.code);
+
             const undoMessageScreen = document.createElement('div');
             undoMessageScreen.classList.add('undo-message-screen');
-            undoMessageScreen.innerHTML = `
-                <div class="message-box">
-                    <p>Are you sure you want to undo the last attendance?</p>
-                    <p>Date: ${lastDate}</p>
-                    <p>Status: ${lastStatus}</p>
-                    <button class="${this.code}-confirmUndo">Confirm</button>
-                    <button class="cancel ${this.code}-cancelUndo">Cancel</button>
-                </div>
-            `;
-            document.body.appendChild(undoMessageScreen);
-            console.log(this.code);
 
-            async function confirmUndo(sheetName, baseURL) {
-                const loadingScreen = document.createElement('div');
-                loadingScreen.classList.add('loading-screen');
-                loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
-                document.body.appendChild(loadingScreen);
-                try {
-                    const bodyUndoData = { method: 'POST', body: `{"type":"Undo","sheetname":"${sheetName}"}` };
-                    const response = await fetch(baseURL, bodyUndoData);
-                    const responseData = await response.json();
+            if (!attendanceData) {
+                // Handle the case when there is no data
+                console.log('No attendance data available.');
+                undoMessageScreen.innerHTML = "";
+                undoMessageScreen.innerHTML = `
+                    <div class="message-box">
+                        <p>No attendance data available.</p>
+                        <button class="cancel ${this.code}-cancelUndo">Cancel</button>
+                    </div>
+                `;
+                document.body.appendChild(undoMessageScreen);
+
+                function cancelUndo() {
+                    // console.log("Undo canceled");
+                    document.body.removeChild(undoMessageScreen);
+                }
+
+                const undoCancelButton = document.querySelector(`.${this.code}-cancelUndo`);
+                undoCancelButton.addEventListener('click', () => cancelUndo());
+            } else {
+                // const { lastDate, lastStatus } = await fetchLastAttendanceData(this.code);
+                const { lastDate, lastStatus } = attendanceData;
+
+                undoMessageScreen.innerHTML = `
+                    <div class="message-box">
+                        <p>Are you sure you want to undo the last attendance?</p>
+                        <p>Date: ${lastDate}</p>
+                        <p>Status: ${lastStatus}</p>
+                        <button class="${this.code}-confirmUndo">Confirm</button>
+                        <button class="cancel ${this.code}-cancelUndo">Cancel</button>
+                    </div>
+                `;
+                document.body.appendChild(undoMessageScreen);
+                console.log(this.code);
     
-                    // console.log(responseData);
-                    // console.log(sheetName);
-                    // console.log(bodyUndoData);
-                    console.log("Undo confirmed");
-                    undoMessageScreen.innerHTML = "";
-                    undoMessageScreen.innerHTML = `
-                        <div class="message-box">
-                            <p>${responseData.message}</p>
-                            <button class="cancel ${sheetName}-cancelSubCancelUndo">Cancel</button>
-                        </div>
-                    `;
-                    const cancelSubCancelUndoButton = document.querySelector(`.${sheetName}-cancelSubCancelUndo`);
-                    cancelSubCancelUndoButton.addEventListener('click', () => cancelSubCancelUndo(sheetName));
-                } catch (err) {
-                    console.error(err);
-                } finally {
-                    // Hide loading screen
-                    document.body.removeChild(loadingScreen);
+                async function confirmUndo(sheetName, baseURL) {
+                    const loadingScreen = document.createElement('div');
+                    loadingScreen.classList.add('loading-screen');
+                    loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
+                    document.body.appendChild(loadingScreen);
+                    try {
+                        const bodyUndoData = { method: 'POST', body: `{"type":"Undo","sheetname":"${sheetName}"}` };
+                        const response = await fetch(baseURL, bodyUndoData);
+                        const responseData = await response.json();
+        
+                        // console.log(responseData);
+                        // console.log(sheetName);
+                        // console.log(bodyUndoData);
+                        console.log("Undo confirmed");
+                        undoMessageScreen.innerHTML = "";
+                        undoMessageScreen.innerHTML = `
+                            <div class="message-box">
+                                <p>${responseData.message}</p>
+                                <button class="cancel ${sheetName}-cancelSubCancelUndo">Cancel</button>
+                            </div>
+                        `;
+                        const cancelSubCancelUndoButton = document.querySelector(`.${sheetName}-cancelSubCancelUndo`);
+                        cancelSubCancelUndoButton.addEventListener('click', () => cancelSubCancelUndo(sheetName));
+                    } catch (err) {
+                        console.error(err);
+                    } finally {
+                        // Hide loading screen
+                        document.body.removeChild(loadingScreen);
+                    }
                 }
-            }
-
-            async function cancelSubCancelUndo(code) {
-                // console.log("Undo canceled");
-                document.body.removeChild(undoMessageScreen);
-                const loadingScreen = document.createElement('div');
-                loadingScreen.classList.add('loading-screen');
-                loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
-                document.body.appendChild(loadingScreen);
-                try {
-                    const { totalStatuses, totalPresent } = await fetchData(code);
-                    const attendanceCountN = totalPresent;
-                    const totalAttendanceCountN = totalStatuses;
-
-                    const countElement = document.querySelector(`#${code}-subheading-details-text`);
-                    countElement.textContent = `${attendanceCountN}/${totalAttendanceCountN}`;
-
-                    const progressBarContainer = document.querySelector(`#${code}-progressbar`);
-                    progressBarContainer.innerHTML = "";
-
-                    const percentageForProgressbar = ((attendanceCountN / totalAttendanceCountN) * 100).toFixed(2);
-                    const varTempPrecentage = isNaN(percentageForProgressbar) ? 0 : percentageForProgressbar;
-
-                    const progressBar = new AttendanceProgressBarCard(varTempPrecentage, `${code}-progressbar`);
-                    progressBar.createCard();
-                } catch (err) {
-                    console.error(err);
-                } finally {
-                    // Hide loading screen
-                    document.body.removeChild(loadingScreen);
+    
+                async function cancelSubCancelUndo(code) {
+                    // console.log("Undo canceled");
+                    document.body.removeChild(undoMessageScreen);
+                    const loadingScreen = document.createElement('div');
+                    loadingScreen.classList.add('loading-screen');
+                    loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
+                    document.body.appendChild(loadingScreen);
+                    try {
+                        const { totalStatuses, totalPresent } = await fetchData(code);
+                        const attendanceCountN = totalPresent;
+                        const totalAttendanceCountN = totalStatuses;
+    
+                        const countElement = document.querySelector(`#${code}-subheading-details-text`);
+                        countElement.textContent = `${attendanceCountN}/${totalAttendanceCountN}`;
+    
+                        const progressBarContainer = document.querySelector(`#${code}-progressbar`);
+                        progressBarContainer.innerHTML = "";
+    
+                        const percentageForProgressbar = ((attendanceCountN / totalAttendanceCountN) * 100).toFixed(2);
+                        const varTempPrecentage = isNaN(percentageForProgressbar) ? 0 : percentageForProgressbar;
+    
+                        const progressBar = new AttendanceProgressBarCard(varTempPrecentage, `${code}-progressbar`);
+                        progressBar.createCard();
+                    } catch (err) {
+                        console.error(err);
+                    } finally {
+                        // Hide loading screen
+                        document.body.removeChild(loadingScreen);
+                    }
                 }
-            }
+    
+                function cancelUndo() {
+                    // console.log("Undo canceled");
+                    document.body.removeChild(undoMessageScreen);
+                }
 
-            function cancelUndo() {
-                // console.log("Undo canceled");
-                document.body.removeChild(undoMessageScreen);
+                const undoConfirmButton = document.querySelector(`.${this.code}-confirmUndo`);
+                const undoCancelButton = document.querySelector(`.${this.code}-cancelUndo`);
+                undoConfirmButton.addEventListener('click', () => confirmUndo(this.code, this.baseURL));
+                undoCancelButton.addEventListener('click', () => cancelUndo());
             }
-            const undoConfirmButton = document.querySelector(`.${this.code}-confirmUndo`);
-            const undoCancelButton = document.querySelector(`.${this.code}-cancelUndo`);
-            undoConfirmButton.addEventListener('click', () => confirmUndo(this.code, this.baseURL));
-            undoCancelButton.addEventListener('click', () => cancelUndo());
         } catch (err) {
             console.error(err);
         }
@@ -285,6 +312,7 @@ async function fetchData(sheetnumber) {
         console.error(err);
     }
 }
+
 async function fetchLastAttendanceData(sheetnumber) {
     const loadingScreen = document.createElement('div');
     loadingScreen.classList.add('loading-screen');
@@ -293,12 +321,18 @@ async function fetchLastAttendanceData(sheetnumber) {
     try {
         const response = await fetch(`${baseURL}?sheetname=${sheetnumber}`, options);
         const data = await response.json();
-        const totalNumberOfStatuses = data.data.length;
-        const lastDate = data.data[totalNumberOfStatuses-1].date;
-        const lastStatus = data.data[totalNumberOfStatuses-1].status;
-      
-        return { lastDate, lastStatus };
-      
+        if (data.data.length === 0 ) {
+            // Handle the case when there is no attendance data available 
+            // console.log('No attendance data available.');
+            
+            return null;
+        } else {
+            const totalNumberOfStatuses = data.data.length;
+            const lastDate = data.data[totalNumberOfStatuses-1].date;
+            const lastStatus = data.data[totalNumberOfStatuses-1].status;
+          
+            return { lastDate, lastStatus };
+        }
     } catch (err) {
         console.error(err);
     } finally {
