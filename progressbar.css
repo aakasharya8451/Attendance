@@ -1,37 +1,42 @@
+main {
+    width: 100%;
+    height: 100vh;
+    background-color: aqua;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.test {
+    background-color: bisque;
+    height: 500px;
+    width: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
 .card {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
     background-color: #ffffff;
-    margin: 0 20px;
-    width: max-content;
-    height: max-content;
-    /* border-radius: 5px; */
-    /* box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.2); */
-    /* animation: fadeIn 1s ease-in-out; */
+    width: 210px;
+    height: 210px;
 }
-
-/* @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-} */
 
 .card .percent {
     position: relative;
+    width: 100%;
+    height: 100%;
 }
 
 .card svg {
     position: relative;
-    width: 210px;
-    height: 210px;
+    width: 100%;
+    height: 100%;
     transform: rotate(-90deg);
 }
 
@@ -56,7 +61,6 @@
     from {
         stroke-dashoffset: 625px;
     }
-
     to {
         stroke-dashoffset: calc(625px - (625px * var(--percent)) / 100);
     }
@@ -76,4 +80,38 @@
 
 .card .number h3 span {
     font-size: 2rem;
+}
+
+@media only screen and (max-width: 393px) {
+    .card {
+        width: 80px;
+        height: 80px;
+    }
+
+    .card svg circle {
+        stroke-width: 5;
+    }
+
+    .card svg circle:last-of-type {
+        stroke-dasharray: 218.75px;
+        stroke-dashoffset: calc(218.75px - (218.75px * var(--percent)) / 100);
+    }
+
+    @keyframes draw {
+        from {
+            stroke-dashoffset: 218.75px;
+        }
+
+        to {
+            stroke-dashoffset: calc(218.75px - (218.75px * var(--percent)) / 100);
+        }
+    }
+
+    .card .number h3 {
+        font-size: 1.5rem;
+    }
+
+    .card .number h3 span {
+        font-size: 1rem;
+    }
 }

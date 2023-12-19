@@ -4,10 +4,6 @@ class AttendanceProgressBarCard {
         this.parentElement = parentElement;
         this.determineColor();
     }
-    // constructor(percent) {
-    //     this.percent = percent;
-    //     this.determineColor();
-    // }
 
     determineColor() {
         if (this.percent > 85) {
@@ -22,6 +18,10 @@ class AttendanceProgressBarCard {
     createCard() {
         const card = document.createElement("div");
         card.className = "card";
+        var parentElementID = document.getElementById(this.parentElement);
+        parentElementID.appendChild(card);
+
+        var cardWidth = card.offsetWidth;
 
         const percentDiv = document.createElement("div");
         percentDiv.className = "percent";
@@ -30,13 +30,13 @@ class AttendanceProgressBarCard {
         const circle1 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         const circle2 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
 
-        circle1.setAttribute("cx", "105");
-        circle1.setAttribute("cy", "105");
-        circle1.setAttribute("r", "100");
+        circle1.setAttribute("cx", `${cardWidth/2}`);
+        circle1.setAttribute("cy", `${cardWidth/2}`);
+        circle1.setAttribute("r", `${(cardWidth/2)-5}`);
 
-        circle2.setAttribute("cx", "105");
-        circle2.setAttribute("cy", "105");
-        circle2.setAttribute("r", "100");
+        circle2.setAttribute("cx", `${cardWidth/2}`);
+        circle2.setAttribute("cy", `${cardWidth/2}`);
+        circle2.setAttribute("r", `${(cardWidth/2)-5}`);
         circle2.style.setProperty("--percent", this.percent);
 
         svg.appendChild(circle1);
@@ -56,12 +56,10 @@ class AttendanceProgressBarCard {
         card.appendChild(percentDiv);
 
           // Set stroke color
-        if (this.strokeColor) {
-            circle2.style.setProperty("--stroke-color", this.strokeColor);
-        }
+            if (this.strokeColor) {
+                circle2.style.setProperty("--stroke-color", this.strokeColor);
+            }
 
-        var parentElementID = document.getElementById(this.parentElement);
-        parentElementID.appendChild(card);
         }
       }
 
