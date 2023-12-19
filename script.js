@@ -7,10 +7,10 @@ class AttendanceCard {
     constructor(subject, code, totalAttendanceCount, attendanceCount, baseURL) {
         this.subject = subject;
         this.code = code;
-        this.attendanceCount = attendanceCount;
-        this.totalAttendanceCount = totalAttendanceCount;
+        this.attendanceCount = isNaN(attendanceCount)? 0 : attendanceCount;
+        this.totalAttendanceCount = isNaN(totalAttendanceCount)? 0 : totalAttendanceCount;
         this.baseURL = baseURL;
-        this.attendanceStatus = 'Attend Next 4 Class';
+        this.attendanceStatus = getAttendanceStatus(this.attendanceCount, this.totalAttendanceCount);
         globalObject.instances.push(this);
         this.createCard();
         this.addEventListeners();
@@ -438,6 +438,31 @@ async function login() {
             document.body.removeChild(loginScreen);
         }
     });
+}
+
+function getAttendanceStatus(daysPresent, totalDays) {
+  var currentPercentage = (daysPresent / totalDays) * 100;
+
+  if (currentPercentage > 75) {
+      var excessDays = totalDays;
+      while (currentPercentage >= 75) {
+          excessDays++;
+          currentPercentage = (daysPresent / excessDays) * 100
+      }
+    if (((excessDays - totalDays)-1) === 0) {
+        return `Attend Next Class`;
+    }else{
+        return `You can Leave ${(excessDays - totalDays)-1} Class`;
+    }
+  }
+  else {
+    const daysToAttend = Math.ceil(((0.75 * totalDays) - daysPresent) / 0.25);
+    if (daysToAttend === 0 || daysToAttend === 1) {
+      return `Attend Next Class`;
+    } else {
+      return `Attend Next ${daysToAttend} Class`;
+    }
+  }
 }
 
 let loginStatus = false;
