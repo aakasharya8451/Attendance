@@ -35,7 +35,7 @@ class AttendanceCard {
                     </div>
                     <div class="attendance-status">
                         <span class="subheading-text">Status: </span>
-                        <span class="subheading-details-text">${this.attendanceStatus}</span>
+                        <span class="subheading-details-text" id="${this.code}-subheading-details-status-text">${this.attendanceStatus}</span>
                     </div>
                 </div>
             </div>
@@ -53,9 +53,7 @@ class AttendanceCard {
         // Append the card to the attendance card container
         document.querySelector('.attendance-card-container').appendChild(card);
     }
-    fre() {
-        console.log(this.code);
-    }
+
     defaultProgressBar() {
         const progressBarContainer = document.querySelector(`#${this.code}-progressbar`);
         progressBarContainer.innerHTML = "";
@@ -171,6 +169,11 @@ class AttendanceCard {
     
                         const countElement = document.querySelector(`#${code}-subheading-details-text`);
                         countElement.textContent = `${self.attendanceCount}/${self.totalAttendanceCount}`;
+
+                        var status = getAttendanceStatus(self.attendanceCount, self.totalAttendanceCount); 
+                        self.attendanceStatus = status;
+                        const statusElement = document.querySelector(`#${self.code}-subheading-details-status-text`);
+                        statusElement.textContent = self.attendanceStatus;
     
                         const progressBarContainer = document.querySelector(`#${code}-progressbar`);
                         progressBarContainer.innerHTML = "";
@@ -226,6 +229,11 @@ class AttendanceCard {
             const countElement = document.querySelector(`#${this.code}-subheading-details-text`);
             countElement.textContent = `${this.attendanceCount}/${this.totalAttendanceCount}`;
 
+            var status = getAttendanceStatus(this.attendanceCount, this.totalAttendanceCount); 
+            this.attendanceStatus = status;
+            const statusElement = document.querySelector(`#${this.code}-subheading-details-status-text`);
+            statusElement.textContent = this.attendanceStatus;
+
             const progressBarContainer = document.querySelector(`#${this.code}-progressbar`);
             progressBarContainer.innerHTML = "";
 
@@ -262,6 +270,11 @@ class AttendanceCard {
 
             const countElement = document.querySelector(`#${this.code}-subheading-details-text`);
             countElement.textContent = `${this.attendanceCount}/${this.totalAttendanceCount}`;
+
+            var status = getAttendanceStatus(this.attendanceCount, this.totalAttendanceCount); 
+            this.attendanceStatus = status;
+            const statusElement = document.querySelector(`#${this.code}-subheading-details-status-text`);
+            statusElement.textContent = this.attendanceStatus;
 
             const progressBarContainer = document.querySelector(`#${this.code}-progressbar`);
             progressBarContainer.innerHTML = "";
