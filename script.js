@@ -53,7 +53,9 @@ class AttendanceCard {
         // Append the card to the attendance card container
         document.querySelector('.attendance-card-container').appendChild(card);
     }
-
+    fre() {
+        console.log(this.code);
+    }
     defaultProgressBar() {
         const progressBarContainer = document.querySelector(`#${this.code}-progressbar`);
         progressBarContainer.innerHTML = "";
@@ -144,24 +146,7 @@ class AttendanceCard {
                             </div>
                         `;
                         const cancelSubCancelUndoButton = document.querySelector(`.${sheetName}-cancelSubCancelUndo`);
-                        cancelSubCancelUndoButton.addEventListener('click', async () => {
-                            try {
-                                // const result = await cancelSubCancelUndo(sheetName);
-                                // console.log(result);
-                                // console.log(result.attendanceCountN);
-                                // console.log(result.totalAttendanceCountN);
-                                const { attendanceCountN, totalAttendanceCountN } = await cancelSubCancelUndo(sheetName);
-                                // console.log(attendanceCountN);
-                                // console.log(totalAttendanceCountN);
-                                // console.log(self.attendanceCount);
-                                // console.log(self.totalAttendanceCount);
-                                self.attendanceCount = attendanceCountN;
-                                self.totalAttendanceCount = totalAttendanceCountN;
-                            } catch (error) {
-                                console.error(error);
-                            }
-                            
-                        });
+                        cancelSubCancelUndoButton.addEventListener('click', cancelSubCancelUndo(sheetName));
                     } catch (err) {
                         console.error(err);
                     } finally {
@@ -179,22 +164,22 @@ class AttendanceCard {
                     document.body.appendChild(loadingScreen);
                     try {
                         const { totalStatuses, totalPresent } = await fetchData(code);
-                        const attendanceCountN = totalPresent;
-                        const totalAttendanceCountN = totalStatuses;
+                        self.attendanceCount = totalPresent;
+                        self.totalAttendanceCount = totalStatuses;
+                        // const attendanceCountN = totalPresent;
+                        // const totalAttendanceCountN = totalStatuses;
     
                         const countElement = document.querySelector(`#${code}-subheading-details-text`);
-                        countElement.textContent = `${attendanceCountN}/${totalAttendanceCountN}`;
+                        countElement.textContent = `${self.attendanceCount}/${self.totalAttendanceCount}`;
     
                         const progressBarContainer = document.querySelector(`#${code}-progressbar`);
                         progressBarContainer.innerHTML = "";
     
-                        const percentageForProgressbar = ((attendanceCountN / totalAttendanceCountN) * 100).toFixed(2);
+                        const percentageForProgressbar = ((self.attendanceCount / self.totalAttendanceCount) * 100).toFixed(2);
                         const varTempPrecentage = isNaN(percentageForProgressbar) ? 0 : percentageForProgressbar;
     
                         const progressBar = new AttendanceProgressBarCard(varTempPrecentage, `${code}-progressbar`);
                         progressBar.createCard();
-
-                        return { attendanceCountN, totalAttendanceCountN };
                     } catch (err) {
                         console.error(err);
                     } finally {
@@ -463,18 +448,20 @@ window.onload = async () => {
 
 window.onresize = () => {
     if (loginStatus) {
-        console.log("Logged in");
+        // console.log("Logged in");
         var viewportWidth = window.innerWidth || document.documentElement.clientWidth;
         if (viewportWidth <= 394) {
-            console.log("Viewport width: " + viewportWidth + "px");
+            // console.log("Viewport width: " + viewportWidth + "px");
             for (let i = 0; i < globalObject.instances.length; i++){
-                console.log(globalObject.instances[i]);
-                console.log(globalObject.instances[i].attendanceCount);
-                console.log(globalObject.instances[i].totalAttendanceCount);
+                globalObject.instances[i].defaultProgressBar();
+                // console.log(globalObject.instances[i]);
+                // console.log(globalObject.instances[i].attendanceCount);
+                // console.log(globalObject.instances[i].totalAttendanceCount);
+            }
+        } else {
+            for (let i = 0; i < globalObject.instances.length; i++){
+                globalObject.instances[i].defaultProgressBar();
             }
         }
-        // console.log(globalObject.instances);
-    } else {
-        console.log("Not Logged in");
     }
 }
