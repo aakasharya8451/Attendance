@@ -1,4 +1,8 @@
 // JavaScript Class for Attendance Card
+const globalObject = {
+    instances: []
+};
+
 class AttendanceCard {
     constructor(subject, code, totalAttendanceCount, attendanceCount, baseURL) {
         this.subject = subject;
@@ -7,7 +11,7 @@ class AttendanceCard {
         this.totalAttendanceCount = totalAttendanceCount;
         this.baseURL = baseURL;
         this.attendanceStatus = 'Attend Next 4 Class';
-
+        globalObject.instances.push(this);
         this.createCard();
         this.addEventListeners();
         this.defaultProgressBar();
@@ -77,6 +81,7 @@ class AttendanceCard {
     async undoLastAttendance() {
         // console.log(this.code, "undo Button pressed");
         try {
+            const self = this;
             const attendanceData = await fetchLastAttendanceData(this.code);
 
             const undoMessageScreen = document.createElement('div');
@@ -116,7 +121,7 @@ class AttendanceCard {
                 `;
                 document.body.appendChild(undoMessageScreen);
                 // console.log(this.code);
-    
+
                 async function confirmUndo(sheetName, baseURL) {
                     const loadingScreen = document.createElement('div');
                     loadingScreen.classList.add('loading-screen');
@@ -139,7 +144,24 @@ class AttendanceCard {
                             </div>
                         `;
                         const cancelSubCancelUndoButton = document.querySelector(`.${sheetName}-cancelSubCancelUndo`);
-                        cancelSubCancelUndoButton.addEventListener('click', () => cancelSubCancelUndo(sheetName));
+                        cancelSubCancelUndoButton.addEventListener('click', async () => {
+                            try {
+                                // const result = await cancelSubCancelUndo(sheetName);
+                                // console.log(result);
+                                // console.log(result.attendanceCountN);
+                                // console.log(result.totalAttendanceCountN);
+                                const { attendanceCountN, totalAttendanceCountN } = await cancelSubCancelUndo(sheetName);
+                                // console.log(attendanceCountN);
+                                // console.log(totalAttendanceCountN);
+                                // console.log(self.attendanceCount);
+                                // console.log(self.totalAttendanceCount);
+                                self.attendanceCount = attendanceCountN;
+                                self.totalAttendanceCount = totalAttendanceCountN;
+                            } catch (error) {
+                                console.error(error);
+                            }
+                            
+                        });
                     } catch (err) {
                         console.error(err);
                     } finally {
@@ -171,6 +193,8 @@ class AttendanceCard {
     
                         const progressBar = new AttendanceProgressBarCard(varTempPrecentage, `${code}-progressbar`);
                         progressBar.createCard();
+
+                        return { attendanceCountN, totalAttendanceCountN };
                     } catch (err) {
                         console.error(err);
                     } finally {
@@ -361,73 +385,96 @@ async function fetchDataForAllSubjects() {
 }
 
 async function login() {
-    const loginScreen = document.createElement('div');
-    loginScreen.classList.add('login-message-screen');
-    loginScreen.innerHTML = `
-        <div class="message-box login-message-box">
-            <p>Login</p>
-            <label for="password">Enter Password:</label>
-            <input type="password" id="password" name="password">
-            <br>
-            <button class="confirmLogin">Login</button>
-            <!-- <button class="cancel cancelLogin">Cancel</button> -->
-        </div>
-    `;
-    document.body.appendChild(loginScreen);
-
-    const passwordInput = loginScreen.querySelector('#password');
-    const loginMessageBox = document.querySelector(".login-message-box");
-    const errorMessage = document.createElement('h2');
-    errorMessage.classList.add('error-message');
-
-    const confirmLoginButton = loginScreen.querySelector('.confirmLogin');
-    // const cancelLoginButton = loginScreen.querySelector('.cancelLogin');
-    confirmLoginButton.addEventListener('click', () => confirmLogin());
-    // cancelLoginButton.addEventListener('click', () => cancelLogin());
-
-    async function confirmLogin() {
-        const loadingScreen = document.createElement('div');
-        loadingScreen.classList.add('loading-screen');
-        loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
-        document.body.appendChild(loadingScreen);
-        loginMessageBox.appendChild(errorMessage);
-        
-        const inputPassword = passwordInput.value;
-        try {
-            // console.log(inputPassword);
-            const authenticationBody = {
-                method: 'POST',
-                headers: {},
-                body: JSON.stringify({
-                    type: 'Authentication',
-                    password: inputPassword
-                })
-            }
-            const response = await fetch(baseURL, authenticationBody);
-
-            if (response.ok) {
-                const result = await response.json();
-                if (result.status) {
-                    // console.log(result.message);
-                    cancelLogin();
-                    fetchDataForAllSubjects();
-                } else {
-                    // console.log(result.error);
-                    errorMessage.innerText = result.error;
-                }
-            }
-        } catch (err) {
-        console.error(err);
-        } finally {
-            document.body.removeChild(loadingScreen);
-        }
-    }
-
-    async function cancelLogin() {
-        document.body.removeChild(loginScreen);
-    }
+    return new Promise(async (resolve) => {
+        const loginScreen = document.createElement('div');
+        loginScreen.classList.add('login-message-screen');
+        loginScreen.innerHTML = `
+            <div class="message-box login-message-box">
+                <p>Login</p>
+                <label for="password">Enter Password:</label>
+                <input type="password" id="password" name="password">
+                <br>
+                <button class="confirmLogin">Login</button>
+                <!-- <button class="cancel cancelLogin">Cancel</button> -->
+            </div>
+        `;
+        document.body.appendChild(loginScreen);
     
+        const passwordInput = loginScreen.querySelector('#password');
+        const loginMessageBox = document.querySelector(".login-message-box");
+        const errorMessage = document.createElement('h2');
+        errorMessage.classList.add('error-message');
+    
+        const confirmLoginButton = loginScreen.querySelector('.confirmLogin');
+        // const cancelLoginButton = loginScreen.querySelector('.cancelLogin');
+        confirmLoginButton.addEventListener('click', () => confirmLogin());
+        // cancelLoginButton.addEventListener('click', () => cancelLogin());
+    
+        async function confirmLogin() {
+            const loadingScreen = document.createElement('div');
+            loadingScreen.classList.add('loading-screen');
+            loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
+            document.body.appendChild(loadingScreen);
+            loginMessageBox.appendChild(errorMessage);
+            
+            const inputPassword = passwordInput.value;
+            try {
+                // console.log(inputPassword);
+                const authenticationBody = {
+                    method: 'POST',
+                    headers: {},
+                    body: JSON.stringify({
+                        type: 'Authentication',
+                        password: inputPassword
+                    })
+                }
+                const response = await fetch(baseURL, authenticationBody);
+    
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.status) {
+                        // console.log(result.message);
+                        cancelLogin();
+                        fetchDataForAllSubjects();
+                        resolve(true);
+                    } else {
+                        // console.log(result.error);
+                        errorMessage.innerText = result.error;
+                    }
+                }
+            } catch (err) {
+            console.error(err);
+            } finally {
+                document.body.removeChild(loadingScreen);
+            }
+        }
+    
+        async function cancelLogin() {
+            document.body.removeChild(loginScreen);
+        }
+    });
 }
 
-login()
+let loginStatus = false;
 
+window.onload = async () => {
+    loginStatus = await login();
+}
+
+window.onresize = () => {
+    if (loginStatus) {
+        console.log("Logged in");
+        var viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+        if (viewportWidth <= 394) {
+            console.log("Viewport width: " + viewportWidth + "px");
+            for (let i = 0; i < globalObject.instances.length; i++){
+                console.log(globalObject.instances[i]);
+                console.log(globalObject.instances[i].attendanceCount);
+                console.log(globalObject.instances[i].totalAttendanceCount);
+            }
+        }
+        // console.log(globalObject.instances);
+    } else {
+        console.log("Not Logged in");
+    }
+}
