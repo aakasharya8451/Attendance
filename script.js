@@ -354,10 +354,14 @@ async function fetchData(sheetnumber) {
 
 function scrollUp() {
     window.scroll({
-        top: 500,
+        top: 0,
         left: 0,
         behavior: 'smooth'
     });
+}
+
+function disableScroll() {
+    document.body.style.overflow = 'hidden';
 }
 
 async function fetchLastAttendanceData(sheetnumber) {
@@ -432,6 +436,7 @@ async function login() {
 
         async function confirmLogin() {
             scrollUp();
+            disableScroll();
             const loadingScreen = document.createElement('div');
             loadingScreen.classList.add('loading-screen');
             loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
