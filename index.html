@@ -1,48 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet" href="progressbar.css">
     <link rel="stylesheet" href="root.css">
     <link rel="stylesheet" href="style.css">
+
+    <!-- iOS-specific meta tags for PWA behavior -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Attendance APP">
+
+    <!-- iOS splash screen images -->
+    <link rel="apple-touch-icon" sizes="152x152" href="icons/ios/152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/ios/180.png">
+
+    <link rel="manifest" href="/manifest.json">
     <title>Attendance</title>
 </head>
+
 <body>
     <section class="main">
         <div class="heading">Attendance</div>
         <section class="attendance-card-container">
-            <!-- <div class="attendance-card">
-                <div class="left-container">
-                    <div class="attendance-subject-heading-conatiner">
-                        <span class="subject-heading">Data Mining</span>
-                        <span class="subject-code">CA355</span>
-                    </div>
-                    <div class="attendance-subject-details">
-                        <div class="attendance-count">
-                            <span class="subheading-text">Attendance: </span>
-                            <span class="subheading-details-text"></span>
-                        </div>
-                        <div class="attendance-status">
-                            <span class="subheading-text">Status: </span>
-                            <span class="subheading-details-text"></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="right-container">
-                    <div class="top-progressbar-container" id="CA355">
-                    </div>
-                    <div class="bottom-attendance-mark-button-container">
-                        <div class="present-button"><i class="material-symbols-outlined icon-size">check_circle</i></div>
-                        <div class="absent-button"><i class="material-symbols-outlined icon-size">cancel</i></div>
-                    </div>
-                </div>
-            </div> -->
         </section>
     </section>
     <script src="progressbar.js"></script>
     <script src="script.js"></script>
-    
+
 </body>
+
 </html>
