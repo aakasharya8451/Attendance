@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
+    <link rel="stylesheet" href="root.css">
+    <link rel="stylesheet" href="style.css">
+    <title>Attendance Data</title>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body onload="selectOption()" class="p-3 m-0 border-0 bd-example m-0 border-0">
+    <div class="heading">Attendance Data</div>
+    <select id="selectOption" class="form-select" onchange="loadData()" aria-label="Subject">
+        <option selected="" disabled>Subject</option>
+        <option value="CA355">Data Mining (CA355)</option>
+        <option value="CA356">Distributed Computing (CA356)</option>
+        <option value="CA325">Unix and Shell Programming (CA325)</option>
+        <option value="CA328">Distributed Database Systems (CA328)</option>
+    </select>
+
+    <table id="dataTable" border="1" class="table table-responsive table-hover table-dark">
+        <thead>
+
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+</body>
+<script>
+    function selectOption() {
+        // Get the sheetname parameter from the URL
+        var sheetname = getParameterByName('sheetname');
+
+        if (sheetname !== null) {
+            var selectOptions = document.getElementById("selectOption");
+
+            for (var i = 0; i < selectOptions.options.length; i++) {
+                if (selectOptions.options[i].value === sheetname) {
+                    selectOptions.options[i].selected = true;
+                    break;
+                }
+            }
+            loadData();
+        }
+    }
+    function loadData() {
+        const loadingScreen = document.createElement('div');
+        loadingScreen.classList.add('loading-screen');
+        loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
+        document.body.appendChild(loadingScreen);
+
+        // Get the selected value from the dropdown
+        var selectedOption = document.getElementById("selectOption").value;
+
+        var apiUrl = "https://script.google.com/macros/s/AKfycbwgUAwkJdCD2TabDINjZNp7Qr-xbGV5FUtHeLbcG2VJ2gSrIScejsVo9iz5y9jzb5o/exec?sheetname=" + selectedOption;
+
+        // Make an API call using fetch
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                // Call a function to update the table with the received data
+                updateTable(data.data);
+                document.body.removeChild(loadingScreen);
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    }
+
+    function updateTable(data) {
+        //Create thead of the table head
+        var thead = document.querySelector("#dataTable thead");
+
+        thead.innerHTML = "";
+
+        var row = document.createElement("tr");
+
+        // Style the row
+        row.style.fontWeight = "bold";
+        row.style.fontSize = "16px";
+
+        var dateCell = document.createElement("td");
+        dateCell.textContent = "Date";
+        row.appendChild(dateCell);
+
+        var dayCell = document.createElement("td");
+        dayCell.textContent = "Day";
+        row.appendChild(dayCell);
+
+        var statusCell = document.createElement("td");
+        statusCell.textContent = "Status";
+        row.appendChild(statusCell);
+
+        // Append the row to the table head
+        thead.appendChild(row);
+
+        // Get the table body
+        var tbody = document.querySelector("#dataTable tbody");
+
+        // Clear existing table rows
+        tbody.innerHTML = "";
+
+        // Iterate over the data and populate the table
+        data.forEach(item => {
+            var row = document.createElement("tr");
+
+            // Assuming each item in the JSON has 'date' and 'status' properties
+            var dateCell = document.createElement("td");
+            dateCell.textContent = item.date;
+            row.appendChild(dateCell);
+
+            var dayCell = document.createElement("td");
+            dayCell.textContent = getDayOfWeekFormatted(item.date);
+            row.appendChild(dayCell);
+
+            var statusCell = document.createElement("td");
+            statusCell.textContent = item.status;
+            if (statusCell.textContent === "Present") {
+                statusCell.style.color = "#45CE30";
+                statusCell.style.fontWeight = "bold";
+            } else if (statusCell.textContent === "Absent") {
+                statusCell.style.color = "red";
+                statusCell.style.fontWeight = "bolder";
+            } else {
+                statusCell.style.color = "yellow";
+                statusCell.style.fontWeight = "bold";
+            }
+            row.appendChild(statusCell);
+
+            // Append the row to the table body
+            tbody.appendChild(row);
+        });
+
+        // Style the cells to center text
+        var cells = document.querySelectorAll("#dataTable td");
+        cells.forEach(cell => {
+            cell.style.textAlign = "center";
+        });
+    }
+    function getDayOfWeekFormatted(dateString) {
+        // Parse the input string in "DD/MM/YY" format
+        const parts = dateString.split('/');
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1; // Month is zero-based
+        const year = 2000 + parseInt(parts[2], 10); // Assuming years in 2000s
+
+        // Create a Date object
+        const date = new Date(year, month, day);
+
+        // Check if the input is a valid date
+        if (isNaN(date)) {
+            return "Invalid Date";
+        }
+
+        // Array of day names
+        const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+        // Get day of the week (0-6) and format it as DD/MM/YY
+        const dayOfWeek = daysOfWeek[date.getDay()];
+
+        return `${dayOfWeek}`;
+    }
+    // Function to get URL parameters
+    function getParameterByName(name, url) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+</script>
+
+</html>

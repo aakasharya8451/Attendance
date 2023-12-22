@@ -7,8 +7,8 @@ class AttendanceCard {
     constructor(subject, code, totalAttendanceCount, attendanceCount, baseURL) {
         this.subject = subject;
         this.code = code;
-        this.attendanceCount = isNaN(attendanceCount)? 0 : attendanceCount;
-        this.totalAttendanceCount = isNaN(totalAttendanceCount)? 0 : totalAttendanceCount;
+        this.attendanceCount = isNaN(attendanceCount) ? 0 : attendanceCount;
+        this.totalAttendanceCount = isNaN(totalAttendanceCount) ? 0 : totalAttendanceCount;
         this.baseURL = baseURL;
         this.attendanceStatus = getAttendanceStatus(this.attendanceCount, this.totalAttendanceCount);
         globalObject.instances.push(this);
@@ -21,6 +21,18 @@ class AttendanceCard {
         // Create the HTML structure for the attendance card
         const card = document.createElement('div');
         card.classList.add('attendance-card');
+
+        var pressTimer;
+
+        card.addEventListener("touchstart", (e) => {
+            pressTimer = setTimeout(() => {
+                window.location.href = `../table.html?sheetname=${this.code}`;
+            }, 1000);
+        });
+
+        card.addEventListener("touchend", function () {
+            clearTimeout(pressTimer);
+        });
 
         card.innerHTML = `
             <div class="left-container">
@@ -131,7 +143,7 @@ class AttendanceCard {
                         const bodyUndoData = { method: 'POST', body: `{"type":"Undo","sheetname":"${sheetName}"}` };
                         const response = await fetch(baseURL, bodyUndoData);
                         const responseData = await response.json();
-        
+
                         // console.log(responseData);
                         // console.log(sheetName);
                         // console.log(bodyUndoData);
@@ -152,7 +164,7 @@ class AttendanceCard {
                         document.body.removeChild(loadingScreen);
                     }
                 }
-    
+
                 async function cancelSubCancelUndo(code) {
                     // console.log("Undo canceled");
                     document.body.removeChild(undoMessageScreen);
@@ -166,21 +178,21 @@ class AttendanceCard {
                         self.totalAttendanceCount = totalStatuses;
                         // const attendanceCountN = totalPresent;
                         // const totalAttendanceCountN = totalStatuses;
-    
+
                         const countElement = document.querySelector(`#${code}-subheading-details-text`);
                         countElement.textContent = `${self.attendanceCount}/${self.totalAttendanceCount}`;
 
-                        var status = getAttendanceStatus(self.attendanceCount, self.totalAttendanceCount); 
+                        var status = getAttendanceStatus(self.attendanceCount, self.totalAttendanceCount);
                         self.attendanceStatus = status;
                         const statusElement = document.querySelector(`#${self.code}-subheading-details-status-text`);
                         statusElement.textContent = self.attendanceStatus;
-    
+
                         const progressBarContainer = document.querySelector(`#${code}-progressbar`);
                         progressBarContainer.innerHTML = "";
-    
+
                         const percentageForProgressbar = ((self.attendanceCount / self.totalAttendanceCount) * 100).toFixed(2);
                         const varTempPrecentage = isNaN(percentageForProgressbar) ? 0 : percentageForProgressbar;
-    
+
                         const progressBar = new AttendanceProgressBarCard(varTempPrecentage, `${code}-progressbar`);
                         progressBar.createCard();
                     } catch (err) {
@@ -190,7 +202,7 @@ class AttendanceCard {
                         document.body.removeChild(loadingScreen);
                     }
                 }
-    
+
                 function cancelUndo() {
                     // console.log("Undo canceled");
                     document.body.removeChild(undoMessageScreen);
@@ -229,7 +241,7 @@ class AttendanceCard {
             const countElement = document.querySelector(`#${this.code}-subheading-details-text`);
             countElement.textContent = `${this.attendanceCount}/${this.totalAttendanceCount}`;
 
-            var status = getAttendanceStatus(this.attendanceCount, this.totalAttendanceCount); 
+            var status = getAttendanceStatus(this.attendanceCount, this.totalAttendanceCount);
             this.attendanceStatus = status;
             const statusElement = document.querySelector(`#${this.code}-subheading-details-status-text`);
             statusElement.textContent = this.attendanceStatus;
@@ -271,7 +283,7 @@ class AttendanceCard {
             const countElement = document.querySelector(`#${this.code}-subheading-details-text`);
             countElement.textContent = `${this.attendanceCount}/${this.totalAttendanceCount}`;
 
-            var status = getAttendanceStatus(this.attendanceCount, this.totalAttendanceCount); 
+            var status = getAttendanceStatus(this.attendanceCount, this.totalAttendanceCount);
             this.attendanceStatus = status;
             const statusElement = document.querySelector(`#${this.code}-subheading-details-status-text`);
             statusElement.textContent = this.attendanceStatus;
@@ -293,18 +305,18 @@ class AttendanceCard {
     }
 }
 
-    // markAttendance(status) {
-    //     // Update attendance count and status
-    //     this.attendanceCount++;
-    //     this.attendanceStatus = status;
+// markAttendance(status) {
+//     // Update attendance count and status
+//     this.attendanceCount++;
+//     this.attendanceStatus = status;
 
-    //     // Update the DOM elements
-    //     const countElement = document.querySelector(`#${this.code} .subheading-details-text`);
-    //     const statusElement = document.querySelector(`#${this.code} .subheading-status-text`);
+//     // Update the DOM elements
+//     const countElement = document.querySelector(`#${this.code} .subheading-details-text`);
+//     const statusElement = document.querySelector(`#${this.code} .subheading-status-text`);
 
-    //     countElement.textContent = this.attendanceCount;
-    //     statusElement.textContent = this.attendanceStatus;
-    // }
+//     countElement.textContent = this.attendanceCount;
+//     statusElement.textContent = this.attendanceStatus;
+// }
 
 // }
 
@@ -313,26 +325,34 @@ class AttendanceCard {
 // attendanceData.forEach(data => new AttendanceCard(data.subject, data.code));
 
 const attendanceData = [
-  { subject: 'Data Mining', code: 'CA355' },
-  { subject: 'Distributed Computing', code: 'CA356' },
-  { subject: 'Unix and Shell Programming', code: 'CA325' },
-  { subject: 'Distributed Database Systems', code: 'CA328' },
+    { subject: 'Data Mining', code: 'CA355' },
+    { subject: 'Distributed Computing', code: 'CA356' },
+    { subject: 'Unix and Shell Programming', code: 'CA325' },
+    { subject: 'Distributed Database Systems', code: 'CA328' },
 ];
 const options = { method: 'GET' };
 
-const baseURL = "https://script.google.com/macros/s/AKfycbyEKlvkTyjaugWkXKvij_DmUNlNZPrAtCXiZJmSDhUoF5RGJ40XvLnr7siULZ-FgUQ/exec";
+const baseURL = "https://script.google.com/macros/s/AKfycbwgUAwkJdCD2TabDINjZNp7Qr-xbGV5FUtHeLbcG2VJ2gSrIScejsVo9iz5y9jzb5o/exec";
 async function fetchData(sheetnumber) {
     try {
         const response = await fetch(`${baseURL}?sheetname=${sheetnumber}`, options);
         const data = await response.json();
         const totalStatuses = data.data.length;
         const totalPresent = data.data.filter(item => item.status === 'Present').length;
-      
+
         return { totalStatuses, totalPresent };
-      
+
     } catch (err) {
         console.error(err);
     }
+}
+
+function scrollUp() {
+    window.scroll({
+        top: 500,
+        left: 0,
+        behavior: 'smooth'
+    });
 }
 
 async function fetchLastAttendanceData(sheetnumber) {
@@ -343,16 +363,13 @@ async function fetchLastAttendanceData(sheetnumber) {
     try {
         const response = await fetch(`${baseURL}?sheetname=${sheetnumber}`, options);
         const data = await response.json();
-        if (data.data.length === 0 ) {
-            // Handle the case when there is no attendance data available 
-            // console.log('No attendance data available.');
-            
+        if (data.data.length === 0) {
             return null;
         } else {
             const totalNumberOfStatuses = data.data.length;
-            const lastDate = data.data[totalNumberOfStatuses-1].date;
-            const lastStatus = data.data[totalNumberOfStatuses-1].status;
-          
+            const lastDate = data.data[totalNumberOfStatuses - 1].date;
+            const lastStatus = data.data[totalNumberOfStatuses - 1].status;
+
             return { lastDate, lastStatus };
         }
     } catch (err) {
@@ -369,11 +386,11 @@ async function fetchDataForAllSubjects() {
     document.body.appendChild(loadingScreen);
     try {
         for (let elementAt = 0; elementAt < attendanceData.length; elementAt++) {
-          const subject = attendanceData[elementAt].subject;
-          const code = attendanceData[elementAt].code;
-          
-          const { totalStatuses, totalPresent } = await fetchData(code);
-          new AttendanceCard(subject, code, totalStatuses, totalPresent, baseURL);
+            const subject = attendanceData[elementAt].subject;
+            const code = attendanceData[elementAt].code;
+
+            const { totalStatuses, totalPresent } = await fetchData(code);
+            new AttendanceCard(subject, code, totalStatuses, totalPresent, baseURL);
         }
     } catch (err) {
         console.error(err);
@@ -390,34 +407,34 @@ async function login() {
             <div class="message-box login-message-box">
                 <p>Login</p>
                 <label for="password">Enter Password:</label>
-                <input type="password" id="password" name="password">
+                <input type="password" id="password" name="password" required>
                 <br>
                 <button class="confirmLogin">Login</button>
                 <!-- <button class="cancel cancelLogin">Cancel</button> -->
             </div>
         `;
         document.body.appendChild(loginScreen);
-    
+
         const passwordInput = loginScreen.querySelector('#password');
         const loginMessageBox = document.querySelector(".login-message-box");
         const errorMessage = document.createElement('h2');
         errorMessage.classList.add('error-message');
-    
+
         const confirmLoginButton = loginScreen.querySelector('.confirmLogin');
         // const cancelLoginButton = loginScreen.querySelector('.cancelLogin');
         confirmLoginButton.addEventListener('click', () => confirmLogin());
         // cancelLoginButton.addEventListener('click', () => cancelLogin());
-    
+
         async function confirmLogin() {
+            scrollUp();
             const loadingScreen = document.createElement('div');
             loadingScreen.classList.add('loading-screen');
             loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
             document.body.appendChild(loadingScreen);
             loginMessageBox.appendChild(errorMessage);
-            
+
             const inputPassword = passwordInput.value;
             try {
-                // console.log(inputPassword);
                 const authenticationBody = {
                     method: 'POST',
                     headers: {},
@@ -427,7 +444,7 @@ async function login() {
                     })
                 }
                 const response = await fetch(baseURL, authenticationBody);
-    
+
                 if (response.ok) {
                     const result = await response.json();
                     if (result.status) {
@@ -441,12 +458,12 @@ async function login() {
                     }
                 }
             } catch (err) {
-            console.error(err);
+                console.error(err);
             } finally {
                 document.body.removeChild(loadingScreen);
             }
         }
-    
+
         async function cancelLogin() {
             document.body.removeChild(loginScreen);
         }
@@ -454,28 +471,28 @@ async function login() {
 }
 
 function getAttendanceStatus(daysPresent, totalDays) {
-  var currentPercentage = (daysPresent / totalDays) * 100;
+    var currentPercentage = (daysPresent / totalDays) * 100;
 
-  if (currentPercentage > 75) {
-      var excessDays = totalDays;
-      while (currentPercentage >= 75) {
-          excessDays++;
-          currentPercentage = (daysPresent / excessDays) * 100
-      }
-    if (((excessDays - totalDays)-1) === 0) {
-        return `Attend Next Class`;
-    }else{
-        return `You can Leave ${(excessDays - totalDays)-1} Class`;
+    if (currentPercentage > 75) {
+        var excessDays = totalDays;
+        while (currentPercentage >= 75) {
+            excessDays++;
+            currentPercentage = (daysPresent / excessDays) * 100
+        }
+        if (((excessDays - totalDays) - 1) === 0) {
+            return `Attend Next Class`;
+        } else {
+            return `You can Leave ${(excessDays - totalDays) - 1} Class`;
+        }
     }
-  }
-  else {
-    const daysToAttend = Math.ceil(((0.75 * totalDays) - daysPresent) / 0.25);
-    if (daysToAttend === 0 || daysToAttend === 1) {
-      return `Attend Next Class`;
-    } else {
-      return `Attend Next ${daysToAttend} Class`;
+    else {
+        const daysToAttend = Math.ceil(((0.75 * totalDays) - daysPresent) / 0.25);
+        if (daysToAttend === 0 || daysToAttend === 1) {
+            return `Attend Next Class`;
+        } else {
+            return `Attend Next ${daysToAttend} Class`;
+        }
     }
-  }
 }
 
 let loginStatus = false;
@@ -490,14 +507,14 @@ window.onresize = () => {
         var viewportWidth = window.innerWidth || document.documentElement.clientWidth;
         if (viewportWidth <= 394) {
             // console.log("Viewport width: " + viewportWidth + "px");
-            for (let i = 0; i < globalObject.instances.length; i++){
+            for (let i = 0; i < globalObject.instances.length; i++) {
                 globalObject.instances[i].defaultProgressBar();
                 // console.log(globalObject.instances[i]);
                 // console.log(globalObject.instances[i].attendanceCount);
                 // console.log(globalObject.instances[i].totalAttendanceCount);
             }
         } else {
-            for (let i = 0; i < globalObject.instances.length; i++){
+            for (let i = 0; i < globalObject.instances.length; i++) {
                 globalObject.instances[i].defaultProgressBar();
             }
         }
