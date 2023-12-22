@@ -232,9 +232,10 @@
         font-size: 2.8rem;
         padding: 1rem;
         padding-top: .5rem;
+        padding-bottom: .5rem;
     }
     .attendance-card-container {
-        padding: 1rem;
+        padding: .75rem;
         gap: 1rem;
     }
 
