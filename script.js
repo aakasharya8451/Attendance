@@ -24,15 +24,20 @@ class AttendanceCard {
 
         var pressTimer;
 
-        card.addEventListener("touchstart", (e) => {
+        const handlePressAndHold = () => {
+            clearTimeout(pressTimer);
             pressTimer = setTimeout(() => {
                 window.location.href = `../table.html?sheetname=${this.code}`;
             }, 1000);
-        });
+        };
 
-        card.addEventListener("touchend", function () {
-            clearTimeout(pressTimer);
-        });
+        // Touch events
+        card.addEventListener('touchstart', handlePressAndHold);
+        card.addEventListener('touchend', () => clearTimeout(pressTimer));
+
+        // Mouse events
+        card.addEventListener('mousedown', handlePressAndHold);
+        card.addEventListener('mouseup', () => clearTimeout(pressTimer));
 
         card.innerHTML = `
             <div class="left-container">
