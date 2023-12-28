@@ -406,10 +406,6 @@ function scrollUp() {
     });
 }
 
-function disableScroll() {
-    document.body.style.overflow = 'hidden';
-}
-
 async function login() {
     return new Promise(async (resolve) => {
         const loginScreen = document.createElement('div');
@@ -439,7 +435,6 @@ async function login() {
 
         async function confirmLogin() {
             scrollUp();
-            disableScroll();
 
             const loadingScreen = displayLoadingScreen();
             const inputPassword = passwordInput.value;

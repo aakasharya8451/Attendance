@@ -222,6 +222,9 @@
 /* Extra Small Devices, Phones */
 @media only screen and (max-width: 393px){
     /* Styles for devices with a viewport size of 393 x 852 pixels and pixel ratio 3 go here */
+    body{
+        overflow: hidden;
+    }
     .main {
         padding-left: 1rem;
         padding-right: 1rem;
