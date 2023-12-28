@@ -363,10 +363,27 @@ async function fetchData(sheetnumber) {
 }
 
 
+async function fetchDataForAllSubjects() {
+    const loadingScreen = displayLoadingScreen();
+    try {
+        let subjectCodeArray = [];
+        attendanceData.forEach(data => { subjectCodeArray.push(data.code); });
+        const resultantParallelDataResponseArray = await Promise.all(subjectCodeArray.map(fetchData));
 
+        for (let elementAt = 0; elementAt < attendanceData.length; elementAt++) {
+            const subject = attendanceData[elementAt].subject;
+            const code = attendanceData[elementAt].code;
+            const totalStatuses = resultantParallelDataResponseArray[elementAt].totalStatuses;
+            const totalPresent = resultantParallelDataResponseArray[elementAt].totalPresent;
 
-
-
+            new AttendanceCard(subject, code, totalStatuses, totalPresent, baseURL);
+        }
+    } catch (err) {
+        console.error(err);
+    } finally {
+        document.body.removeChild(loadingScreen);
+    }
+}
 
 
 
@@ -466,22 +483,7 @@ function  displayLoadingScreen() {
 
 
 
-async function fetchDataForAllSubjects() {
-    const loadingScreen = displayLoadingScreen();
-    try {
-        for (let elementAt = 0; elementAt < attendanceData.length; elementAt++) {
-            const subject = attendanceData[elementAt].subject;
-            const code = attendanceData[elementAt].code;
 
-            const { totalStatuses, totalPresent } = await fetchData(code);
-            new AttendanceCard(subject, code, totalStatuses, totalPresent, baseURL);
-        }
-    } catch (err) {
-        console.error(err);
-    } finally {
-        document.body.removeChild(loadingScreen);
-    }
-}
 
 
 
@@ -578,6 +580,7 @@ async function login() {
         const loginMessageBox = document.querySelector(".login-message-box");
         const errorMessage = document.createElement('h2');
         errorMessage.classList.add('error-message');
+        loginMessageBox.appendChild(errorMessage);
 
         const confirmLoginButton = loginScreen.querySelector('.confirmLogin');
         // const cancelLoginButton = loginScreen.querySelector('.cancelLogin');
@@ -587,10 +590,10 @@ async function login() {
         async function confirmLogin() {
             scrollUp();
             disableScroll();
-            const loadingScreen = displayLoadingScreen();
-            loginMessageBox.appendChild(errorMessage);
 
+            const loadingScreen = displayLoadingScreen();
             const inputPassword = passwordInput.value;
+
             try {
                 const authenticationBody = {
                     method: 'POST',
