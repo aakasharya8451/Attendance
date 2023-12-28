@@ -140,10 +140,7 @@ class AttendanceCard {
                 // console.log(this.code);
 
                 async function confirmUndo(sheetName, baseURL) {
-                    const loadingScreen = document.createElement('div');
-                    loadingScreen.classList.add('loading-screen');
-                    loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
-                    document.body.appendChild(loadingScreen);
+                    const loadingScreen = displayLoadingScreen();
                     try {
                         const bodyUndoData = { method: 'POST', body: `{"type":"Undo","sheetname":"${sheetName}"}` };
                         const response = await fetch(baseURL, bodyUndoData);
@@ -173,10 +170,7 @@ class AttendanceCard {
                 async function cancelSubCancelUndo(code) {
                     // console.log("Undo canceled");
                     document.body.removeChild(undoMessageScreen);
-                    const loadingScreen = document.createElement('div');
-                    loadingScreen.classList.add('loading-screen');
-                    loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
-                    document.body.appendChild(loadingScreen);
+                    const loadingScreen = displayLoadingScreen();
                     try {
                         const { totalStatuses, totalPresent } = await fetchData(code);
                         self.attendanceCount = totalPresent;
@@ -225,10 +219,7 @@ class AttendanceCard {
 
     async markAttendancePresent() {
         // Display loading screen
-        const loadingScreen = document.createElement('div');
-        loadingScreen.classList.add('loading-screen');
-        loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
-        document.body.appendChild(loadingScreen);
+        const loadingScreen = displayLoadingScreen();
 
         const bodyAttendanceData = { method: 'POST', body: `{"type":"Mark","sheetname":"${this.code}","status":"Present"}` };
 
@@ -269,10 +260,7 @@ class AttendanceCard {
 
     async markAttendanceAbsent() {
         // Display loading screen
-        const loadingScreen = document.createElement('div');
-        loadingScreen.classList.add('loading-screen');
-        loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
-        document.body.appendChild(loadingScreen);
+        const loadingScreen = displayLoadingScreen();
 
         const bodyAttendanceData = { method: 'POST', body: `{"type":"Mark","sheetname":"${this.code}","status":"Absent"}` };
 
@@ -310,24 +298,46 @@ class AttendanceCard {
     }
 }
 
-// markAttendance(status) {
-//     // Update attendance count and status
-//     this.attendanceCount++;
-//     this.attendanceStatus = status;
-
-//     // Update the DOM elements
-//     const countElement = document.querySelector(`#${this.code} .subheading-details-text`);
-//     const statusElement = document.querySelector(`#${this.code} .subheading-status-text`);
-
-//     countElement.textContent = this.attendanceCount;
-//     statusElement.textContent = this.attendanceStatus;
-// }
-
-// }
 
 
-// Instantiate objects for each attendance card using the sample data
-// attendanceData.forEach(data => new AttendanceCard(data.subject, data.code));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const attendanceData = [
     { subject: 'Data Mining', code: 'CA355' },
@@ -352,23 +362,45 @@ async function fetchData(sheetnumber) {
     }
 }
 
-function scrollUp() {
-    window.scroll({
-        top: 0,
-        left: 0,
-        behavior: 'smooth'
-    });
-}
 
-function disableScroll() {
-    document.body.style.overflow = 'hidden';
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 async function fetchLastAttendanceData(sheetnumber) {
-    const loadingScreen = document.createElement('div');
-    loadingScreen.classList.add('loading-screen');
-    loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
-    document.body.appendChild(loadingScreen);
+    const loadingScreen = displayLoadingScreen();
+
     try {
         const response = await fetch(`${baseURL}?sheetname=${sheetnumber}`, options);
         const data = await response.json();
@@ -388,11 +420,54 @@ async function fetchLastAttendanceData(sheetnumber) {
     }
 }
 
-async function fetchDataForAllSubjects() {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function  displayLoadingScreen() {
     const loadingScreen = document.createElement('div');
     loadingScreen.classList.add('loading-screen');
     loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
     document.body.appendChild(loadingScreen);
+    return loadingScreen;
+}
+
+
+
+
+
+
+
+
+
+async function fetchDataForAllSubjects() {
+    const loadingScreen = displayLoadingScreen();
     try {
         for (let elementAt = 0; elementAt < attendanceData.length; elementAt++) {
             const subject = attendanceData[elementAt].subject;
@@ -407,6 +482,81 @@ async function fetchDataForAllSubjects() {
         document.body.removeChild(loadingScreen);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function scrollUp() {
+    window.scroll({
+        top: 0,
+        left: 0,
+        behavior: 'smooth'
+    });
+}
+
+function disableScroll() {
+    document.body.style.overflow = 'hidden';
+}
+
+
+
+
+
+
+
+
+
+
+
 
 async function login() {
     return new Promise(async (resolve) => {
@@ -437,10 +587,7 @@ async function login() {
         async function confirmLogin() {
             scrollUp();
             disableScroll();
-            const loadingScreen = document.createElement('div');
-            loadingScreen.classList.add('loading-screen');
-            loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
-            document.body.appendChild(loadingScreen);
+            const loadingScreen = displayLoadingScreen();
             loginMessageBox.appendChild(errorMessage);
 
             const inputPassword = passwordInput.value;
@@ -480,6 +627,71 @@ async function login() {
     });
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function getAttendanceStatus(daysPresent, totalDays) {
     var currentPercentage = (daysPresent / totalDays) * 100;
 
@@ -505,11 +717,136 @@ function getAttendanceStatus(daysPresent, totalDays) {
     }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 let loginStatus = false;
 
 window.onload = async () => {
     loginStatus = await login();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 window.onresize = () => {
     if (loginStatus) {
