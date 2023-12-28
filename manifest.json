@@ -4,8 +4,8 @@
     "description": "BIT Lalpur Attendance APP",
     "start_url": "/index.html",
     "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#000000",
+    "background_color": "#233039",
+    "theme_color": "#233039",
     "icons": [
         {
             "src": "icons/windows11/SmallTile.scale-100.png",
