@@ -140,10 +140,7 @@ class AttendanceCard {
                 // console.log(this.code);
 
                 async function confirmUndo(sheetName, baseURL) {
-                    const loadingScreen = document.createElement('div');
-                    loadingScreen.classList.add('loading-screen');
-                    loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
-                    document.body.appendChild(loadingScreen);
+                    const loadingScreen = displayLoadingScreen();
                     try {
                         const bodyUndoData = { method: 'POST', body: `{"type":"Undo","sheetname":"${sheetName}"}` };
                         const response = await fetch(baseURL, bodyUndoData);
@@ -173,10 +170,7 @@ class AttendanceCard {
                 async function cancelSubCancelUndo(code) {
                     // console.log("Undo canceled");
                     document.body.removeChild(undoMessageScreen);
-                    const loadingScreen = document.createElement('div');
-                    loadingScreen.classList.add('loading-screen');
-                    loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
-                    document.body.appendChild(loadingScreen);
+                    const loadingScreen = displayLoadingScreen();
                     try {
                         const { totalStatuses, totalPresent } = await fetchData(code);
                         self.attendanceCount = totalPresent;
@@ -225,10 +219,7 @@ class AttendanceCard {
 
     async markAttendancePresent() {
         // Display loading screen
-        const loadingScreen = document.createElement('div');
-        loadingScreen.classList.add('loading-screen');
-        loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
-        document.body.appendChild(loadingScreen);
+        const loadingScreen = displayLoadingScreen();
 
         const bodyAttendanceData = { method: 'POST', body: `{"type":"Mark","sheetname":"${this.code}","status":"Present"}` };
 
@@ -269,10 +260,7 @@ class AttendanceCard {
 
     async markAttendanceAbsent() {
         // Display loading screen
-        const loadingScreen = document.createElement('div');
-        loadingScreen.classList.add('loading-screen');
-        loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
-        document.body.appendChild(loadingScreen);
+        const loadingScreen = displayLoadingScreen();
 
         const bodyAttendanceData = { method: 'POST', body: `{"type":"Mark","sheetname":"${this.code}","status":"Absent"}` };
 
@@ -310,24 +298,38 @@ class AttendanceCard {
     }
 }
 
-// markAttendance(status) {
-//     // Update attendance count and status
-//     this.attendanceCount++;
-//     this.attendanceStatus = status;
+function getAttendanceStatus(daysPresent, totalDays) {
+    var currentPercentage = (daysPresent / totalDays) * 100;
 
-//     // Update the DOM elements
-//     const countElement = document.querySelector(`#${this.code} .subheading-details-text`);
-//     const statusElement = document.querySelector(`#${this.code} .subheading-status-text`);
+    if (currentPercentage > 75) {
+        var excessDays = totalDays;
+        while (currentPercentage >= 75) {
+            excessDays++;
+            currentPercentage = (daysPresent / excessDays) * 100
+        }
+        if (((excessDays - totalDays) - 1) === 0) {
+            return `Attend Next Class`;
+        } else {
+            return `You can Leave ${(excessDays - totalDays) - 1} Class`;
+        }
+    }
+    else {
+        const daysToAttend = Math.ceil(((0.75 * totalDays) - daysPresent) / 0.25);
+        if (daysToAttend === 0 || daysToAttend === 1) {
+            return `Attend Next Class`;
+        } else {
+            return `Attend Next ${daysToAttend} Class`;
+        }
+    }
+}
 
-//     countElement.textContent = this.attendanceCount;
-//     statusElement.textContent = this.attendanceStatus;
-// }
-
-// }
-
-
-// Instantiate objects for each attendance card using the sample data
-// attendanceData.forEach(data => new AttendanceCard(data.subject, data.code));
+function  displayLoadingScreen() {
+    const loadingScreen = document.createElement('div');
+    loadingScreen.classList.add('loading-screen');
+    loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
+    document.body.appendChild(loadingScreen);
+    return loadingScreen;
+}
 
 const attendanceData = [
     { subject: 'Data Mining', code: 'CA355' },
@@ -352,23 +354,31 @@ async function fetchData(sheetnumber) {
     }
 }
 
-function scrollUp() {
-    window.scroll({
-        top: 0,
-        left: 0,
-        behavior: 'smooth'
-    });
-}
+async function fetchDataForAllSubjects() {
+    const loadingScreen = displayLoadingScreen();
+    try {
+        let subjectCodeArray = [];
+        attendanceData.forEach(data => { subjectCodeArray.push(data.code); });
+        const resultantParallelDataResponseArray = await Promise.all(subjectCodeArray.map(fetchData));
 
-function disableScroll() {
-    document.body.style.overflow = 'hidden';
+        for (let elementAt = 0; elementAt < attendanceData.length; elementAt++) {
+            const subject = attendanceData[elementAt].subject;
+            const code = attendanceData[elementAt].code;
+            const totalStatuses = resultantParallelDataResponseArray[elementAt].totalStatuses;
+            const totalPresent = resultantParallelDataResponseArray[elementAt].totalPresent;
+
+            new AttendanceCard(subject, code, totalStatuses, totalPresent, baseURL);
+        }
+    } catch (err) {
+        console.error(err);
+    } finally {
+        document.body.removeChild(loadingScreen);
+    }
 }
 
 async function fetchLastAttendanceData(sheetnumber) {
-    const loadingScreen = document.createElement('div');
-    loadingScreen.classList.add('loading-screen');
-    loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
-    document.body.appendChild(loadingScreen);
+    const loadingScreen = displayLoadingScreen();
+
     try {
         const response = await fetch(`${baseURL}?sheetname=${sheetnumber}`, options);
         const data = await response.json();
@@ -388,24 +398,12 @@ async function fetchLastAttendanceData(sheetnumber) {
     }
 }
 
-async function fetchDataForAllSubjects() {
-    const loadingScreen = document.createElement('div');
-    loadingScreen.classList.add('loading-screen');
-    loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
-    document.body.appendChild(loadingScreen);
-    try {
-        for (let elementAt = 0; elementAt < attendanceData.length; elementAt++) {
-            const subject = attendanceData[elementAt].subject;
-            const code = attendanceData[elementAt].code;
-
-            const { totalStatuses, totalPresent } = await fetchData(code);
-            new AttendanceCard(subject, code, totalStatuses, totalPresent, baseURL);
-        }
-    } catch (err) {
-        console.error(err);
-    } finally {
-        document.body.removeChild(loadingScreen);
-    }
+function scrollUp() {
+    window.scroll({
+        top: 0,
+        left: 0,
+        behavior: 'smooth'
+    });
 }
 
 async function login() {
@@ -428,6 +426,7 @@ async function login() {
         const loginMessageBox = document.querySelector(".login-message-box");
         const errorMessage = document.createElement('h2');
         errorMessage.classList.add('error-message');
+        loginMessageBox.appendChild(errorMessage);
 
         const confirmLoginButton = loginScreen.querySelector('.confirmLogin');
         // const cancelLoginButton = loginScreen.querySelector('.cancelLogin');
@@ -436,14 +435,10 @@ async function login() {
 
         async function confirmLogin() {
             scrollUp();
-            disableScroll();
-            const loadingScreen = document.createElement('div');
-            loadingScreen.classList.add('loading-screen');
-            loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
-            document.body.appendChild(loadingScreen);
-            loginMessageBox.appendChild(errorMessage);
 
+            const loadingScreen = displayLoadingScreen();
             const inputPassword = passwordInput.value;
+
             try {
                 const authenticationBody = {
                     method: 'POST',
@@ -478,31 +473,6 @@ async function login() {
             document.body.removeChild(loginScreen);
         }
     });
-}
-
-function getAttendanceStatus(daysPresent, totalDays) {
-    var currentPercentage = (daysPresent / totalDays) * 100;
-
-    if (currentPercentage > 75) {
-        var excessDays = totalDays;
-        while (currentPercentage >= 75) {
-            excessDays++;
-            currentPercentage = (daysPresent / excessDays) * 100
-        }
-        if (((excessDays - totalDays) - 1) === 0) {
-            return `Attend Next Class`;
-        } else {
-            return `You can Leave ${(excessDays - totalDays) - 1} Class`;
-        }
-    }
-    else {
-        const daysToAttend = Math.ceil(((0.75 * totalDays) - daysPresent) / 0.25);
-        if (daysToAttend === 0 || daysToAttend === 1) {
-            return `Attend Next Class`;
-        } else {
-            return `Attend Next ${daysToAttend} Class`;
-        }
-    }
 }
 
 let loginStatus = false;
