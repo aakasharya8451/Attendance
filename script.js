@@ -298,46 +298,38 @@ class AttendanceCard {
     }
 }
 
+function getAttendanceStatus(daysPresent, totalDays) {
+    var currentPercentage = (daysPresent / totalDays) * 100;
 
+    if (currentPercentage > 75) {
+        var excessDays = totalDays;
+        while (currentPercentage >= 75) {
+            excessDays++;
+            currentPercentage = (daysPresent / excessDays) * 100
+        }
+        if (((excessDays - totalDays) - 1) === 0) {
+            return `Attend Next Class`;
+        } else {
+            return `You can Leave ${(excessDays - totalDays) - 1} Class`;
+        }
+    }
+    else {
+        const daysToAttend = Math.ceil(((0.75 * totalDays) - daysPresent) / 0.25);
+        if (daysToAttend === 0 || daysToAttend === 1) {
+            return `Attend Next Class`;
+        } else {
+            return `Attend Next ${daysToAttend} Class`;
+        }
+    }
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+function  displayLoadingScreen() {
+    const loadingScreen = document.createElement('div');
+    loadingScreen.classList.add('loading-screen');
+    loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
+    document.body.appendChild(loadingScreen);
+    return loadingScreen;
+}
 
 const attendanceData = [
     { subject: 'Data Mining', code: 'CA355' },
@@ -362,7 +354,6 @@ async function fetchData(sheetnumber) {
     }
 }
 
-
 async function fetchDataForAllSubjects() {
     const loadingScreen = displayLoadingScreen();
     try {
@@ -384,36 +375,6 @@ async function fetchDataForAllSubjects() {
         document.body.removeChild(loadingScreen);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 async function fetchLastAttendanceData(sheetnumber) {
     const loadingScreen = displayLoadingScreen();
@@ -437,106 +398,6 @@ async function fetchLastAttendanceData(sheetnumber) {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function  displayLoadingScreen() {
-    const loadingScreen = document.createElement('div');
-    loadingScreen.classList.add('loading-screen');
-    loadingScreen.innerHTML = '<div class="loading-spinner"></div>';
-    document.body.appendChild(loadingScreen);
-    return loadingScreen;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function scrollUp() {
     window.scroll({
         top: 0,
@@ -548,17 +409,6 @@ function scrollUp() {
 function disableScroll() {
     document.body.style.overflow = 'hidden';
 }
-
-
-
-
-
-
-
-
-
-
-
 
 async function login() {
     return new Promise(async (resolve) => {
@@ -630,226 +480,11 @@ async function login() {
     });
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function getAttendanceStatus(daysPresent, totalDays) {
-    var currentPercentage = (daysPresent / totalDays) * 100;
-
-    if (currentPercentage > 75) {
-        var excessDays = totalDays;
-        while (currentPercentage >= 75) {
-            excessDays++;
-            currentPercentage = (daysPresent / excessDays) * 100
-        }
-        if (((excessDays - totalDays) - 1) === 0) {
-            return `Attend Next Class`;
-        } else {
-            return `You can Leave ${(excessDays - totalDays) - 1} Class`;
-        }
-    }
-    else {
-        const daysToAttend = Math.ceil(((0.75 * totalDays) - daysPresent) / 0.25);
-        if (daysToAttend === 0 || daysToAttend === 1) {
-            return `Attend Next Class`;
-        } else {
-            return `Attend Next ${daysToAttend} Class`;
-        }
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 let loginStatus = false;
 
 window.onload = async () => {
     loginStatus = await login();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 window.onresize = () => {
     if (loginStatus) {
