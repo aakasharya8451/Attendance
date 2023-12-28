@@ -566,6 +566,11 @@
             "src": "icons/ios/1024.png",
             "sizes": "1024x1024",
             "type": "image/png"
+        },
+        {
+            "src": "icons/maskable/maskable_icon.png",
+            "type": "image/png",
+            "purpose": "maskable"
         }
     ],
     "shortcuts": [
