@@ -6,7 +6,7 @@ class AttendanceProgressBarCard {
     }
 
     determineColor() {
-        if (this.percent > 85) {
+        if (this.percent > 80) {
             this.strokeColor = "#2ecc71"; // Green
         } else if (this.percent >= 75 && this.percent <= 80) {
             this.strokeColor = "#f39c12"; // Orange
