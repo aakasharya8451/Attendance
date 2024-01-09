@@ -33,7 +33,54 @@
     </section>
     <script src="progressbar.js"></script>
     <script src="script.js"></script>
+    <script>
+        if ('Notification' in window) {
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    console.log('Notification permission granted');
+                    if ('serviceWorker' in navigator) {
+                        navigator.serviceWorker.register('service-worker.js')
+                            .then(registration => {
+                                console.log('Service Worker registered with scope:', registration.scope);
+                            })
+                            .catch(error => {
+                                console.error('Service Worker registration failed:', error);
+                            });
+                    }
+                } else {
+                    console.warn('Notification permission denied');
+                }
+            });
+        }
+        // function requestNotificationPermission() {
+        // if ('Notification' in window) {
+        //     if (window.hasHadUserInteraction) {
+        //         if (Notification.requestPermission) {
+        //             // Modern browsers with promise-based API
+        //             Notification.requestPermission().then(permission => {
+        //                 if (permission === 'granted') {
+        //                     console.log('Notification permission granted');
+        //                     if ('serviceWorker' in navigator) {
+        //                         navigator.serviceWorker.register('service-worker.js')
+        //                             .then(registration => {
+        //                                 console.log('Service Worker registered with scope:', registration.scope);
+        //                             })
+        //                             .catch(error => {
+        //                                 console.error('Service Worker registration failed:', error);
+        //                             });
+        //                     }
+        //                 } else {
+        //                     console.warn('Notification permission denied');
+        //                 }
+        //             });
+        //         }
+        //     } else {
+        //         console.warn('Notification permission request requires a user gesture.');
+        //     }
+        // }
+        // }
 
+    </script>
 </body>
 
 </html>
